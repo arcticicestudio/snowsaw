@@ -22,7 +22,7 @@ git submodule add https://github.com/arcticicestudio/snowsaw .snowsaw
 This command will add the snowsaw project at the main development branch `develop`, but it is recommened to use a stable release version by running
 ```sh
 cd .snowsaw
-git checkout v0.1.0
+git checkout v0.1.1
 cd ..
 ```
 and commit the changes in your dotfile repository to lock it on the specified version tag.  
@@ -48,7 +48,6 @@ SNOWSAW_BIN="bin/snowsaw"
 SNOWBLOCKS_BASE_DIR_NAME="snowblocks"
 SNOWBLOCKSDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$SNOWBLOCKS_BASE_DIR_NAME"
 
-cd "${SNOWBLOCKSDIR}"
 "${SNOWSAW_DIR}/${SNOWSAW_BIN}" -s "${SNOWBLOCKSDIR}" "${@}"
 ```
 The `${@}` allows to additionally specify supported options on the terminal for a dynamic script execution.
@@ -267,7 +266,7 @@ Defaults are specified as a dictionary mapping action names to settings, which a
 ```
 
 ## Development
-[![](https://img.shields.io/badge/Changelog-0.1.0-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.1.0/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
+[![](https://img.shields.io/badge/Changelog-0.1.1-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.1.1/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
 
 ### Contribution
 Please report issues/bugs, feature requests and suggestions for improvements to the [issue tracker](https://github.com/arcticicestudio/snowsaw/issues).

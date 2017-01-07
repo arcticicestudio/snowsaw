@@ -83,14 +83,14 @@ def main():
                           if os.path.isdir(os.path.join(options.snowblocks_directory[0], snowblock))]
 
         for snowblock in snowblocks:
-            if os.path.isfile(os.path.join(snowblock, snowblock_config_filename)):
+            if os.path.isfile(os.path.join(options.snowblocks_directory[0], snowblock, snowblock_config_filename)):
                 log.info("❄ {}".format(snowblock))
-                tasks = read_config(os.path.join(snowblock, snowblock_config_filename))
+                tasks = read_config(os.path.join(options.snowblocks_directory[0], snowblock, snowblock_config_filename))
 
                 if not isinstance(tasks, list):
                     raise ReadingError("Configuration file must be a list of tasks")
 
-                dispatcher = Dispatcher(snowblock)
+                dispatcher = Dispatcher(os.path.join(options.snowblocks_directory[0], snowblock))
                 success = dispatcher.dispatch(tasks)
                 if success:
                     log.info("==> All tasks executed successfully\n")
