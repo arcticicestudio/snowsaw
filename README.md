@@ -48,7 +48,6 @@ SNOWSAW_BIN="bin/snowsaw"
 SNOWBLOCKS_BASE_DIR_NAME="snowblocks"
 SNOWBLOCKSDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$SNOWBLOCKS_BASE_DIR_NAME"
 
-cd "${SNOWBLOCKSDIR}"
 "${SNOWSAW_DIR}/${SNOWSAW_BIN}" -s "${SNOWBLOCKSDIR}" "${@}"
 ```
 The `${@}` allows to additionally specify supported options on the terminal for a dynamic script execution.
