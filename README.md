@@ -62,7 +62,7 @@ cd ..
 ```
 
 ## Design Concept
-### <img src="assets/icon-snowblocks.svg"/> snowblocks
+### <img src="https://cdn.rawgit.com/arcticicestudio/snowsaw/develop/assets/icon-snowblocks.svg"/> snowblocks
 A `snowblock` is a named directory that represents a topic area.  
 Every valid `snowblock` contains a `snowblock.json` configuration file.  
 All `snowblock` directories are placed in one base directory, defaults to `<DOTFILE_REPOSITORY_ROOT>/snowblocks`, which will be processed recursively.
