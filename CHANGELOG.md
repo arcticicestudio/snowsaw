@@ -4,6 +4,13 @@
 
 ---
 
+# 0.1.1
+*2017-01-07*
+## Bug Fixes
+❯ Removed the unnecessary `cd "${SNOWBLOCKSDIR}"` command in the README example [`bootstrap`](https://github.com/arcticicestudio/snowsaw#create-a-bootstrap-script) script to fix the path error `./bootstrap: line 11: .snowsaw/bin/snowsaw: No such file or directory`. (@arcticicestudio, #13, 850a72b9)
+
+❯ Fixed a relative path mismatch error when searching for snowblock configuration files although the path must actually be absolute which caused all snowblocks to be skipped since no `snowblock.json` has been found relative to the working directory. (@arcticicestudio, #14, 4455d20f)
+
 # 0.1.0
 *2017-01-07*
 ## Features
