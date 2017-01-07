@@ -1,0 +1,17 @@
+# +---------+
+# + PyCharm +
+# +---------+
+# https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+out/
+.idea/*
+!.idea/runConfigurations
+!.idea/misc.xml
+!.idea/modules.xml
+!.idea/vcs.xml
+!.idea/snowsaw.iml
+
+# +--------+
+# + Python +
+# +--------+
+*.pyc
+__pycache__
