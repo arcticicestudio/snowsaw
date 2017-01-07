@@ -1,6 +1,6 @@
 <p align="center"><img src="https://cdn.rawgit.com/arcticicestudio/snowsaw/develop/assets/snowsaw-banner.svg"/></p>
 
-<p align="center"><img src="https://assets-cdn.github.com/favicon.ico" width=24 height=24/> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/github/release/arcticicestudio/snowsaw.svg"/></a> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/badge/pre--release---_-blue.svg"/></a></p>
+<p align="center"><img src="https://assets-cdn.github.com/favicon.ico" width=24 height=24/> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/github/release/arcticicestudio/snowsaw.svg"/></a> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/badge/pre--release---_-blue.svg"/></a> <img src="https://www.python.org/static/favicon.ico" width=24 height=24/> <img src="https://img.shields.io/badge/Python-3.5+-blue.svg"/></p>
 
 <p align="center">A lightweight, plugin-driven and simple configurable dotfile bootstrapper.</p>
 
@@ -22,7 +22,7 @@ git submodule add https://github.com/arcticicestudio/snowsaw .snowsaw
 This command will add the snowsaw project at the main development branch `develop`, but it is recommened to use a stable release version by running
 ```sh
 cd .snowsaw
-git checkout v0.0.0
+git checkout v0.1.0
 cd ..
 ```
 and commit the changes in your dotfile repository to lock it on the specified version tag.  
@@ -62,7 +62,7 @@ cd ..
 ```
 
 ## Design Concept
-### <img src="assets/icon-snowblocks.svg"/> snowblocks
+### <img src="https://cdn.rawgit.com/arcticicestudio/snowsaw/develop/assets/icon-snowblocks.svg"/> snowblocks
 A `snowblock` is a named directory that represents a topic area.  
 Every valid `snowblock` contains a `snowblock.json` configuration file.  
 All `snowblock` directories are placed in one base directory, defaults to `<DOTFILE_REPOSITORY_ROOT>/snowblocks`, which will be processed recursively.
@@ -267,7 +267,7 @@ Defaults are specified as a dictionary mapping action names to settings, which a
 ```
 
 ## Development
-[![](https://img.shields.io/badge/Changelog-0.0.0-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.0.0/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
+[![](https://img.shields.io/badge/Changelog-0.1.0-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.1.0/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
 
 ### Contribution
 Please report issues/bugs, feature requests and suggestions for improvements to the [issue tracker](https://github.com/arcticicestudio/snowsaw/issues).
