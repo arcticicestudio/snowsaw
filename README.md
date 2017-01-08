@@ -76,12 +76,10 @@ The dotfile repository [Igloo](https://github.com/arcticicestudio/igloo) may be 
 
 ```
 <DOTFILE_REPOSITORY_ROOT>
-|-- .snowman
 |-- .git
 |-- .github
-|-- .gitignore
-|-- .gitmodules
-|-- bootstrap
+|-- .snowsaw
+|-- assets
 |-- snowblocks
     |-- atom
         |-- config.cson
@@ -95,8 +93,12 @@ The dotfile repository [Igloo](https://github.com/arcticicestudio/igloo) may be 
     |-- vim
         |-- snowblock.json
         |-- vimrc
-|-- README.md
+|-- .gitignore
+|-- .gitmodules
 |-- CHANGELOG.md
+|-- LICENSE.md
+|-- README.md
+|-- bootstrap
 ```
 > Example directory tree of a dotfile repository
 
