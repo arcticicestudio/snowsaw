@@ -137,7 +137,7 @@ The [core plugins](https://github.com/arcticicestudio/snowsaw/tree/master/snowsa
 snowsaw supports to specify CLI terminal parameters to dynamically control the execution.  
 A terminal help page can be shown by using the `-h`/`--help` option.
 
-| Option | Parameter(s) |Required | Description |
+| Option | Parameter(s) | Required | Description |
 | --- | --- | --- | --- |
 | `-Q`, `--super-quiet` | - | No | Suppress almost all output. |
 | `-q`, `--quiet` | - | No | Suppress most output. |
@@ -164,7 +164,7 @@ Links support an optional extended configuration. In this type of configuration,
 These dictionaries support the following options:
 
 | Option | Values | Default Value | Required | Description |
-| --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | `create` | `true`, `false` | `false` | No | Specifies if the parent directory should be created if necessary. |
 | `force` | `true`, `false` | `false` | No | Specifies if the file or directory should be forcibly linked. **This can cause irreversible data loss! Use with caution!** |
 | `host` | `string[]` | `[]` | No |  Contains hostnames this link should be processed for. Links with an empty array will be processed irrespective of the host. |
@@ -206,7 +206,7 @@ Another way is to specify a two element array where the first element is the she
 Shell tasks support an extended syntax as well, which provides more fine-grained control. A command can be specified as a dictionary that contains the following options:
 
 | Option | Values | Default Value | Required | Description |
-| --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | `command` | `string` | - |  Yes | The command to be run. |
 | `description` | `string` | - | No |  A human-readable description. |
 | `stdin` | `true`, `false` | `false` | No |  Specifies if the standard input stream is enabled. |
