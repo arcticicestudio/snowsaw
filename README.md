@@ -169,8 +169,8 @@ These dictionaries support the following options:
 | `force` | `true`, `false` | `false` | No | Specifies if the file or directory should be forcibly linked. **This can cause irreversible data loss! Use with caution!** |
 | `host` | `string[]` | `[]` | No |  Contains hostnames this link should be processed for. Links with an empty array will be processed irrespective of the host. |
 | `path` | `string`, `null` | `null` | No |  The path to map the source path. If the path is omitted or `null`, snowsaw will use the basename of the destination, with a leading `.` stripped if present. |
-| `relink` | `true`, `false` | No |  `false` | Specifies if incorrect symbolic links should be automatically overwritten. |
-| `relative` | `true`, `false` | No |  `false` | Specifies if the symbolic link should have a relative path. |
+| `relink` | `true`, `false` | `false` |  No | Specifies if incorrect symbolic links should be automatically overwritten. |
+| `relative` | `true`, `false` | `false` |  No | Specifies if the symbolic link should have a relative path. |
 
 ##### Example
 ```json
