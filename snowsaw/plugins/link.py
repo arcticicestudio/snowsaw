@@ -34,7 +34,7 @@ class Link(snowsaw.Plugin):
             force = defaults.get("force", False)
             relink = defaults.get("relink", False)
             create = defaults.get("create", False)
-            hosts = defaults.get("hosts", [])
+            hosts = defaults.get("hosts", {})
             if isinstance(source, dict):
                 relative = source.get("relative", relative)
                 force = source.get("force", force)
