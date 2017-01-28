@@ -34,7 +34,7 @@ class Link(snowsaw.Plugin):
             force = defaults.get("force", False)
             relink = defaults.get("relink", False)
             create = defaults.get("create", False)
-            hosts = defaults.get("hosts", [])
+            hosts = defaults.get("hosts", {})
             if isinstance(source, dict):
                 relative = source.get("relative", relative)
                 force = source.get("force", force)
@@ -46,9 +46,13 @@ class Link(snowsaw.Plugin):
                 path = self._default_source(destination, source)
             path = os.path.expandvars(os.path.expanduser(path))
 
-            if not self._is_target_host(hosts, hostname):
-                self._log.lowinfo("Skipped host specific link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(), path)))
-                continue
+            if hosts:
+                for host in hosts.items():
+                    if not host[0] == hostname:
+                        self._log.lowinfo("Skipped host specific link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(), host[1])))
+                        continue
+                    else:
+                        path = os.path.expandvars(os.path.expanduser(hosts.get(hostname)))
 
             if not self._exists(os.path.join(self._context.snowblock_dir(), path)):
                 success = False
@@ -96,18 +100,6 @@ class Link(snowsaw.Plugin):
         :return: True if the path is a symbolic link
         """
         return os.path.islink(os.path.expanduser(path))
-
-    def _is_target_host(self, hosts, host):
-        """
-        Checks if the specified host is a target.
-
-        A empty default list of target hosts indicates that all hosts are allowed.
-
-        :param hosts: The list of target hosts
-        :param host: The name of the host to check
-        :return: True if the specified host is listed or the hosts list is empty, False otherwise
-        """
-        return True if not hosts or host in hosts else False
 
     def _link_destination(self, path):
         """
