@@ -46,9 +46,13 @@ class Link(snowsaw.Plugin):
                 path = self._default_source(destination, source)
             path = os.path.expandvars(os.path.expanduser(path))
 
-            if not self._is_target_host(hosts, hostname):
-                self._log.lowinfo("Skipped host specific link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(), path)))
-                continue
+            if hosts:
+                for host in hosts.items():
+                    if not host[0] == hostname:
+                        self._log.lowinfo("Skipped host specific link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(), host[1])))
+                        continue
+                    else:
+                        path = os.path.expandvars(os.path.expanduser(hosts.get(hostname)))
 
             if not self._exists(os.path.join(self._context.snowblock_dir(), path)):
                 success = False
