@@ -9,8 +9,29 @@
 It does less than you think, because version control systems do more than you think.  
 Designed to be self-contained and extensible with no external dependencies and no installation required.
 
+  - [Getting started](#getting-started)
+    - [Integration](#integration)
+      - [Add the submodule](#add-the-submodule)
+      - [Create a bootstrap script](#create-a-bootstrap-script)
+    - [Version Update](#version-update)
+  - [Design Concept](#design-concept)
+    - [snowblocks](#snowblocks)
+    - [Repository Structure](#repository-structure)
+  - [Plugins](#plugins)
+    - [Plugins API](#plugin-api)
+  - [CLI](#cli)
+  - [Configuration](#configuration)
+    - [Core Tasks](#core-tasks)
+      - [`link`](#link)
+      - [`shell`](#shell)
+      - [`clean`](#clean)
+    - [Defaults](#defaults)
+  - [Development](#development)
+    - [Contribution](#contribution)
+  - [Credits](#credits)
+
 ## Getting started
-To get started you should read the [design concept](#design-concept) and [configuration](#configuration) documentation sections before integrating snowsaw to understand the way it works.
+Plase make sure to read the [design concept](#design-concept) and [configuration](#configuration) documentation sections before integrating snowsaw to understand the way it works.
 
 ### Integration
 #### Add the submodule
@@ -52,7 +73,7 @@ SNOWBLOCKSDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$SNOWBLOCKS_BASE_DI
 ```
 The `${@}` allows to additionally specify supported options on the terminal for a dynamic script execution.
 
-### Update the version
+### Version Update
 The snowsaw version can be simply updated by checking out to the desired version tag inside the submodule repository:
 ```sh
 cd .snowsaw
