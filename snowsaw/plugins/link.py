@@ -101,18 +101,6 @@ class Link(snowsaw.Plugin):
         """
         return os.path.islink(os.path.expanduser(path))
 
-    def _is_target_host(self, hosts, host):
-        """
-        Checks if the specified host is a target.
-
-        A empty default list of target hosts indicates that all hosts are allowed.
-
-        :param hosts: The list of target hosts
-        :param host: The name of the host to check
-        :return: True if the specified host is listed or the hosts list is empty, False otherwise
-        """
-        return True if not hosts or host in hosts else False
-
     def _link_destination(self, path):
         """
         Gets the destination of the specified symbolic link.
