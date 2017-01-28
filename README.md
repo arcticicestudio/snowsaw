@@ -27,6 +27,8 @@ Designed to be self-contained and extensible with no external dependencies and n
       - [`clean`](#clean)
     - [Defaults](#defaults)
   - [Development](#development)
+    - [Debugging](#debugging)
+      - [JetBrains PyCharm](#jetbrains-pycharm)
     - [Contribution](#contribution)
   - [Credits](#credits)
 
@@ -291,6 +293,22 @@ Defaults are specified as a dictionary mapping action names to settings, which a
 ## Development
 [![](https://img.shields.io/badge/Changelog-0.1.1-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.1.1/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
 
+### Debugging
+#### JetBrains PyCharm
+snowsaw is developed using one of the awesome tools from JetBrains called [PyCharm](https://www.jetbrains.com/pycharm).
+The project files are located in the [`.idea`](https://github.com/arcticicestudio/snowsaw/tree/develop/.idea) directory.
+
+The included [run/debug configurations](https://www.jetbrains.com/help/pycharm/run-debug-configurations.html) for the script must be manually adjusted to match the paths to the main [`snmowsaw`](https://github.com/arcticicestudio/snowsaw/blob/develop/bin/snowsaw) script and the path parameter for the `-s` / `--snowblocks-directory` CLI option.
+![][scrot-readme-debugging-run-configuration]
+
+snowsaw can [run](https://www.jetbrains.com/help/pycharm/running-applications.html) in the debug mode by using the bug icon or from the menu via *Run* -> *Debug 'snowsaw'*.
+![][scrot-readme-debugging-run]
+![][scrot-readme-debugging-run-menu]
+
+The [debug window](https://www.jetbrains.com/help/pycharm/debug-tool-window.html) will automatically toggle to show [*Variables*](https://www.jetbrains.com/help/pycharm/debug-tool-window-variables.html) for defined debug breakpoints marked in the editor gutter.
+![][scrot-readme-debugging-code]
+![][scrot-readme-debugging-variables]
+
 ### Contribution
 Please report issues/bugs, feature requests and suggestions for improvements to the [issue tracker](https://github.com/arcticicestudio/snowsaw/issues).
 
@@ -300,3 +318,9 @@ snowsaw is based on the awesome [Dotbot](https://github.com/anishathalye/dotbot)
 <p align="center"><img src="https://cdn.rawgit.com/arcticicestudio/nord/develop/src/assets/banner-footer-mountains.svg" /></p>
 
 <p align="center"><img src="https://img.shields.io/badge/License-MIT-blue.svg"/></p>
+
+[scrot-readme-debugging-run-configuration]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run-configuration.png
+[scrot-readme-debugging-run]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run.png
+[scrot-readme-debugging-run-menu]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run-menu.png
+[scrot-readme-debugging-variables]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-variables.png
+[scrot-readme-debugging-code]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-code.png
