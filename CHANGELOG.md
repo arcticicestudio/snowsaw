@@ -4,6 +4,49 @@
 
 ---
 
+# 0.2.0
+*2017-01-28*
+## Improvements
+### Core Plugins
+❯ The `hosts` option format of the [`link`](https://github.com/arcticicestudio/snowsaw#link) core plugin has been changed as a result to a bug also fixed in this version.
+Example of the new format:
+```json
+[
+  {
+    "link": {
+      "~/.gitconfig": {
+        "hosts": {
+          "archlinux-home": "gitconfig.home",
+          "archlinux-work": "gitconfig.work"
+        }
+      }
+    }
+  }
+]
+```
+Further information can be found in the bug fixes section below and in the associated issue #18 and PR #19.
+
+### Documentation
+❯ Added a project [debugging guide](https://github.com/arcticicestudio/snowsaw#debugging) for [JetBrains PyCharm](https://www.jetbrains.com/pycharm). (@arcticicestudio, 9694b523)
+![](https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run-configuration.png)
+
+❯ Added a table of content for the [project README](https://github.com/arcticicestudio/snowsaw/blob/develop/README.md). (@arcticicestudio, 1bd1510c)
+
+## Bug Fixes
+### Core Plugins
+❯ Fixed a bug where only the last duplicate link item in a snowblock configuration has been processed when using the
+host-specific option `hosts` although if the host doesn't match the current hostname.
+In some cases when the order of the link items has been changed also valid items for the current host have been marked
+as skippable instead of linking them.
+
+This bug was caused by an internal design conflict with the builtin Python type `dict` (dictionary) that only allows
+unique keys which has been broken by defining multiple link items with the same destination path.
+The new `hosts` option structure allows to define any amount of hosts with their associated target path.
+(@arcticicestudio, #18 / PR #19, b921c489)
+
+### Documentation
+❯ Fixed some Markdown formatting issues in the project README. (@arcticicestudio, 7d7c0104 / e318b8d7)
+
 # 0.1.1
 *2017-01-07*
 ## Bug Fixes

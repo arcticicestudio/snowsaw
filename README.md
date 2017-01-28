@@ -9,8 +9,31 @@
 It does less than you think, because version control systems do more than you think.  
 Designed to be self-contained and extensible with no external dependencies and no installation required.
 
+  - [Getting started](#getting-started)
+    - [Integration](#integration)
+      - [Add the submodule](#add-the-submodule)
+      - [Create a bootstrap script](#create-a-bootstrap-script)
+    - [Version Update](#version-update)
+  - [Design Concept](#design-concept)
+    - [snowblocks](#snowblocks)
+    - [Repository Structure](#repository-structure)
+  - [Plugins](#plugins)
+    - [Plugins API](#plugin-api)
+  - [CLI](#cli)
+  - [Configuration](#configuration)
+    - [Core Tasks](#core-tasks)
+      - [`link`](#link)
+      - [`shell`](#shell)
+      - [`clean`](#clean)
+    - [Defaults](#defaults)
+  - [Development](#development)
+    - [Debugging](#debugging)
+      - [JetBrains PyCharm](#jetbrains-pycharm)
+    - [Contribution](#contribution)
+  - [Credits](#credits)
+
 ## Getting started
-To get started you should read the [design concept](#design-concept) and [configuration](#configuration) documentation sections before integrating snowsaw to understand the way it works.
+Plase make sure to read the [design concept](#design-concept) and [configuration](#configuration) documentation sections before integrating snowsaw to understand the way it works.
 
 ### Integration
 #### Add the submodule
@@ -22,7 +45,7 @@ git submodule add https://github.com/arcticicestudio/snowsaw .snowsaw
 This command will add the snowsaw project at the main development branch `develop`, but it is recommened to use a stable release version by running
 ```sh
 cd .snowsaw
-git checkout v0.1.1
+git checkout v0.2.0
 cd ..
 ```
 and commit the changes in your dotfile repository to lock it on the specified version tag.  
@@ -52,7 +75,7 @@ SNOWBLOCKSDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$SNOWBLOCKS_BASE_DI
 ```
 The `${@}` allows to additionally specify supported options on the terminal for a dynamic script execution.
 
-### Update the version
+### Version Update
 The snowsaw version can be simply updated by checking out to the desired version tag inside the submodule repository:
 ```sh
 cd .snowsaw
@@ -70,18 +93,16 @@ This design allows a modular structured dotfile repository where each topic can 
 The structure plays well with the snowsaw feature that allows to specify one configuration file to only process a single `snowblock`.
 
 ### Repository Structure
-snowsaw does not need any specific repository structure expect the main `snowblock`s directory. A dotfile repository may also contain more than `snowblock` directories. This way the repository can be structured even more fine-grained.
+snowsaw does not need any specific repository structure expect the base snowblocks directory. A dotfile repository may also contain more than one base snowblock directory. This way the repository can be structured even more fine-grained.
 
 The dotfile repository [Igloo](https://github.com/arcticicestudio/igloo) may be used as a repository structure reference.
 
 ```
 <DOTFILE_REPOSITORY_ROOT>
-|-- .snowman
 |-- .git
 |-- .github
-|-- .gitignore
-|-- .gitmodules
-|-- bootstrap
+|-- .snowsaw
+|-- assets
 |-- snowblocks
     |-- atom
         |-- config.cson
@@ -95,8 +116,12 @@ The dotfile repository [Igloo](https://github.com/arcticicestudio/igloo) may be 
     |-- vim
         |-- snowblock.json
         |-- vimrc
-|-- README.md
+|-- .gitignore
+|-- .gitmodules
 |-- CHANGELOG.md
+|-- LICENSE.md
+|-- README.md
+|-- bootstrap
 ```
 > Example directory tree of a dotfile repository
 
@@ -135,7 +160,7 @@ The [core plugins](https://github.com/arcticicestudio/snowsaw/tree/master/snowsa
 snowsaw supports to specify CLI terminal parameters to dynamically control the execution.  
 A terminal help page can be shown by using the `-h`/`--help` option.
 
-| Option | Parameter(s) |Required | Description |
+| Option | Parameter(s) | Required | Description |
 | --- | --- | --- | --- |
 | `-Q`, `--super-quiet` | - | No | Suppress almost all output. |
 | `-q`, `--quiet` | - | No | Suppress most output. |
@@ -162,13 +187,13 @@ Links support an optional extended configuration. In this type of configuration,
 These dictionaries support the following options:
 
 | Option | Values | Default Value | Required | Description |
-| --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | `create` | `true`, `false` | `false` | No | Specifies if the parent directory should be created if necessary. |
 | `force` | `true`, `false` | `false` | No | Specifies if the file or directory should be forcibly linked. **This can cause irreversible data loss! Use with caution!** |
-| `host` | `string[]` | `[]` | No |  Contains hostnames this link should be processed for. Links with an empty array will be processed irrespective of the host. |
+| `hosts` | `dict` | `{}` | No |  Contains key-value entries with hostnames and their associated target path this link should be processed for. Links with an empty dictionary will be processed irrespective of the host. |
 | `path` | `string`, `null` | `null` | No |  The path to map the source path. If the path is omitted or `null`, snowsaw will use the basename of the destination, with a leading `.` stripped if present. |
-| `relink` | `true`, `false` | No |  `false` | Specifies if incorrect symbolic links should be automatically overwritten. |
-| `relative` | `true`, `false` | No |  `false` | Specifies if the symbolic link should have a relative path. |
+| `relink` | `true`, `false` | `false` |  No | Specifies if incorrect symbolic links should be automatically overwritten. |
+| `relative` | `true`, `false` | `false` |  No | Specifies if the symbolic link should have a relative path. |
 
 ##### Example
 ```json
@@ -177,12 +202,17 @@ These dictionaries support the following options:
     "link": {
       "~/.gitconfig": {
         "create": true,
-        "host": ["archlinux-work"],
-        "path": "gitconfig-work"
+        "hosts": {
+          "archlinux-home": "gitconfig.home",
+          "archlinux-work": "gitconfig.work"
+        }
+      },
+      "~/.gitconfig_auth": {
+        "path": "gitconfig_auth.local"
       },
       "~/.gitignore": {
         "force": true,
-        "relink": true
+        "relink": true,
       },
       "~/.git-commit-message": {
         "relative": true
@@ -204,7 +234,7 @@ Another way is to specify a two element array where the first element is the she
 Shell tasks support an extended syntax as well, which provides more fine-grained control. A command can be specified as a dictionary that contains the following options:
 
 | Option | Values | Default Value | Required | Description |
-| --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | `command` | `string` | - |  Yes | The command to be run. |
 | `description` | `string` | - | No |  A human-readable description. |
 | `stdin` | `true`, `false` | `false` | No |  Specifies if the standard input stream is enabled. |
@@ -266,7 +296,23 @@ Defaults are specified as a dictionary mapping action names to settings, which a
 ```
 
 ## Development
-[![](https://img.shields.io/badge/Changelog-0.1.1-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.1.1/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
+[![](https://img.shields.io/badge/Changelog-0.2.0-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.2.0/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
+
+### Debugging
+#### JetBrains PyCharm
+snowsaw is developed using one of the awesome tools from JetBrains called [PyCharm](https://www.jetbrains.com/pycharm).
+The project files are located in the [`.idea`](https://github.com/arcticicestudio/snowsaw/tree/develop/.idea) directory.
+
+The included [run/debug configurations](https://www.jetbrains.com/help/pycharm/run-debug-configurations.html) for the script must be manually adjusted to match the paths to the main [`snmowsaw`](https://github.com/arcticicestudio/snowsaw/blob/develop/bin/snowsaw) script and the path parameter for the `-s` / `--snowblocks-directory` CLI option.
+![][scrot-readme-debugging-run-configuration]
+
+snowsaw can [run](https://www.jetbrains.com/help/pycharm/running-applications.html) in the debug mode by using the bug icon or from the menu via *Run* -> *Debug 'snowsaw'*.
+![][scrot-readme-debugging-run]
+![][scrot-readme-debugging-run-menu]
+
+The [debug window](https://www.jetbrains.com/help/pycharm/debug-tool-window.html) will automatically toggle to show [*Variables*](https://www.jetbrains.com/help/pycharm/debug-tool-window-variables.html) for defined debug breakpoints marked in the editor gutter.
+![][scrot-readme-debugging-code]
+![][scrot-readme-debugging-variables]
 
 ### Contribution
 Please report issues/bugs, feature requests and suggestions for improvements to the [issue tracker](https://github.com/arcticicestudio/snowsaw/issues).
@@ -277,3 +323,9 @@ snowsaw is based on the awesome [Dotbot](https://github.com/anishathalye/dotbot)
 <p align="center"><img src="https://cdn.rawgit.com/arcticicestudio/nord/develop/src/assets/banner-footer-mountains.svg" /></p>
 
 <p align="center"><img src="https://img.shields.io/badge/License-MIT-blue.svg"/></p>
+
+[scrot-readme-debugging-run-configuration]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run-configuration.png
+[scrot-readme-debugging-run]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run.png
+[scrot-readme-debugging-run-menu]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run-menu.png
+[scrot-readme-debugging-variables]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-variables.png
+[scrot-readme-debugging-code]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-code.png
