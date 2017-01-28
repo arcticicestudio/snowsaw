@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='snowsaw',
-    version='0.1.1',
+    version='0.2.0',
     packages=['', 'util', 'logging'],
     package_dir={'': 'snowsaw'},
     url='https://github.com/arcticicestudio/snowsaw',
