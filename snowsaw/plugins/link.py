@@ -47,18 +47,20 @@ class Link(snowsaw.Plugin):
             path = os.path.expandvars(os.path.expanduser(path))
 
             if hosts:
-                for host in hosts.items():
-                    if not host[0] == hostname:
+                if hostname in hosts:
+                    path = os.path.expandvars(os.path.expanduser(hosts.get(hostname)))
+                elif "default" in hosts:
+                    path = os.path.expandvars(os.path.expanduser(hosts.get("default")))
+                    self._log.lowinfo("Applying default link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(),path)))
+                else:
+                    for host in hosts.items():
                         self._log.lowinfo("Skipped host specific link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(), host[1])))
-                        continue
-                    else:
-                        path = os.path.expandvars(os.path.expanduser(hosts.get(hostname)))
+                    return True
 
             if not self._exists(os.path.join(self._context.snowblock_dir(), path)):
                 success = False
                 self._log.warning("Nonexistent target {} -> {}".format(destination, path))
                 continue
-
             if create:
                 success &= self._create(destination)
             if force or relink:
