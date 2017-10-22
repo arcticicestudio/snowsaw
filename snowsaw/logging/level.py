@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class Level(object):
     """
     Logging level names as numeric values.

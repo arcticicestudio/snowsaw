@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 def with_metaclass(meta, *bases):
     class metaclass(meta):
         def __new__(cls, name, this_bases, d):
