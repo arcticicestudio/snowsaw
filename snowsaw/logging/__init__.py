@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Provides a custom logging class with level color support.
 """

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class Color(object):
     """
     Terminal escape sequences for colored logging.
