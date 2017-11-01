@@ -190,7 +190,7 @@ These dictionaries support the following options:
 | --- | --- | --- | --- | --- |
 | `create` | `true`, `false` | `false` | No | Specifies if the parent directory should be created if necessary. |
 | `force` | `true`, `false` | `false` | No | Specifies if the file or directory should be forcibly linked. **This can cause irreversible data loss! Use with caution!** |
-| `hosts` | `dict` | `{}` | No |  Contains key-value entries with hostnames and their associated target path this link should be processed for. Links with an empty dictionary will be processed irrespective of the host.<br><br>The `default` hostname can be specified as fallback target if non of the given hostnames matched. **Note that this will not work for target hosts named `default`!** |
+| `hosts` | `dict` | `{}` | No |  Contains key-value entries with hostnames and their associated target path this link should be processed for. Links with an empty dictionary will be processed irrespective of the host.<br><br>The hostname `-` can be specified as fallback target if non of the given hostnames matched. |
 | `path` | `string`, `null` | `null` | No |  The path to map the source path. If the path is omitted or `null`, snowsaw will use the basename of the destination, with a leading `.` stripped if present. |
 | `relink` | `true`, `false` | `false` |  No | Specifies if incorrect symbolic links should be automatically overwritten. |
 | `relative` | `true`, `false` | `false` |  No | Specifies if the symbolic link should have a relative path. |
@@ -205,7 +205,7 @@ These dictionaries support the following options:
         "hosts": {
           "archlinux-home": "gitconfig.home",
           "archlinux-work": "gitconfig.work",
-          "default": "gitconfig.base"
+          "-": "gitconfig.base"
         }
       },
       "~/.gitconfig_auth": {
