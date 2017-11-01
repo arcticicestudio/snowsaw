@@ -236,6 +236,7 @@ Shell tasks support an extended syntax as well, which provides more fine-grained
 
 | Option | Values | Default Value | Required | Description |
 | --- | --- | --- | --- | --- |
+| `host` | `string` | - | No | The hostname of the machine this script should be executed on. Not supplying a host will result in the shell command executing on every host.<br><br>The hostname '-' can be specified as a default target that will match all hosts. |
 | `command` | `string` | - |  Yes | The command to be run. |
 | `description` | `string` | - | No |  A human-readable description. |
 | `stdin` | `true`, `false` | `false` | No |  Specifies if the standard input stream is enabled. |
