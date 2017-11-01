@@ -51,8 +51,8 @@ class Link(snowsaw.Plugin):
             if hosts:
                 if hostname in hosts:
                     path = os.path.expandvars(os.path.expanduser(hosts.get(hostname)))
-                elif "default" in hosts:
-                    path = os.path.expandvars(os.path.expanduser(hosts.get("default")))
+                elif "-" in hosts:
+                    path = os.path.expandvars(os.path.expanduser(hosts.get("-")))
                     self._log.lowinfo("Applying default link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(),path)))
                 else:
                     for host in hosts.items():
