@@ -93,7 +93,7 @@ This design allows a modular structured dotfile repository where each topic can 
 The structure plays well with the snowsaw feature that allows to specify one configuration file to only process a single `snowblock`.
 
 ### Repository Structure
-snowsaw does not need any specific repository structure expect the base snowblocks directory. A dotfile repository may also contain more than one base snowblock directory. This way the repository can be structured even more fine-grained.
+snowsaw does not need any specific repository structure except the base snowblocks directory. A dotfile repository may also contain more than one base snowblock directory. This way the repository can be structured even more fine-grained.
 
 The dotfile repository [Igloo](https://github.com/arcticicestudio/igloo) may be used as a repository structure reference.
 
