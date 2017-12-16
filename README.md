@@ -33,7 +33,7 @@ Designed to be self-contained and extensible with no external dependencies and n
   - [Credits](#credits)
 
 ## Getting started
-Plase make sure to read the [design concept](#design-concept) and [configuration](#configuration) documentation sections before integrating snowsaw to understand the way it works.
+Please make sure to read the [design concept](#design-concept) and [configuration](#configuration) documentation sections before integrating snowsaw to understand the way it works.
 
 ### Integration
 #### Add the submodule
