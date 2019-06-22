@@ -1,0 +1,34 @@
+{
+  "name": "snowsaw",
+  "title": "snowsaw",
+  "version": "0.0.0",
+  "description": "A lightweight, plugin-driven and simple configurable dotfile bootstrapper",
+  "author": {
+    "name": "Arctic Ice Studio",
+    "email": "development@arcticicestudio.com",
+    "url": "https://www.arcticicestudio.com"
+  },
+  "homepage": "https://github.com/arcticicestudio/snowsaw",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arcticicestudio/snowsaw.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arcticicestudio/snowsaw/issues"
+  },
+  "private": true,
+  "license": "MIT",
+  "keywords": [
+    "dotfiles",
+    "dots",
+    "bootstrap",
+    "bootstrapper",
+    "arcticicestudio"
+  ],
+  "scripts": {},
+  "devDependencies": {
+    "remark-cli": "6.0.1",
+    "remark-preset-lint-arcticicestudio": ">=0.3.0 <1.0.0"
+  },
+  "dependencies": {}
+}

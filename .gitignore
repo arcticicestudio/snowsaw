@@ -4,3 +4,16 @@
 # Project:    snowsaw
 # Repository: https://github.com/arcticicestudio/snowsaw
 # License:    MIT
+
+# +------+
+# + Logs +
+# +------+
+**/*.log
+logs/
+npm-debug.log*
+
+# +---------+
+# + Node.js +
+# +---------+
+.npm/
+**/node_modules/
