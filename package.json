@@ -2,7 +2,7 @@
   "name": "snowsaw",
   "title": "snowsaw",
   "version": "0.0.0",
-  "description": "A lightweight, plugin-driven and simple configurable dotfile bootstrapper",
+  "description": "A lightweight, plugin-driven and dynamic dotfiles bootstrapper",
   "author": {
     "name": "Arctic Ice Studio",
     "email": "development@arcticicestudio.com",

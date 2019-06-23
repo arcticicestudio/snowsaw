@@ -15,6 +15,12 @@
 # leave all files detected as binary untouched.
 * text=auto
 
+# +--------+
+# + Assets +
+# +--------+
+*.ai binary
+*.png binary
+
 # +------------+
 # + Encryption +
 # +------------+

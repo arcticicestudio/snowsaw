@@ -10,7 +10,7 @@ As for everything else in the project, the contributions to snowsaw are governed
 
 ## Getting Started
 
-snowsaw is an open source project and we love to receive contributions from the community! There are many ways to contribute, from [writing- and improving documentation and tutorials](#documentations), [reporting bugs](#bug-reports), [submitting enhancement suggestions](#enhancement-suggestions) which can be incorporated into this project by [submitting a pull request](#pull-requests).
+snowsaw is an open source project and we love to receive contributions from the [community][spectrum-community]! There are many ways to contribute, from [writing- and improving documentation and tutorials](#documentations), [reporting bugs](#bug-reports), [submitting enhancement suggestions](#enhancement-suggestions) which can be incorporated into this project by [submitting a pull request](#pull-requests).
 
 The project development workflow and process uses [GitHub Issues][gh-issues]- and [Pull Requests][gh-pr] management to track issues and pull requests including multiple [issue templates][gh-issues-templates].
 
@@ -206,5 +206,6 @@ Thanks for the inspirations and attributions to GitHub's [Open Source Guides][os
 [react-contrib]: https://facebook.github.io/react/contributing/how-to-contribute.html
 [ruby-on-rails-contrib]: http://guides.rubyonrails.org/contributing_to_ruby_on_rails.html
 [semver]: https://semver.org
+[spectrum-community]: https://spectrum.chat/arcticicestudio/snowsaw
 [sscce]: http://sscce.org
 [stackoverflow-mcve]: https://stackoverflow.com/help/mcve
