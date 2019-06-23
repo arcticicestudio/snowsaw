@@ -7,7 +7,16 @@
 # References:
 #   https://git-scm.com/docs/gitattributes
 #   https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Keyword-Expansion
+#   https://github.com/AGWA/git-crypt
+#   https://www.gnupg.org
+#   https://wiki.archlinux.org/index.php/GnuPG
 
 # Automatically perform line feed (LF) normalization for files detected as text and
 # leave all files detected as binary untouched.
 * text=auto
+
+# +------------+
+# + Encryption +
+# +------------+
+.gitattributes !filter !diff
+.gitignore !filter !diff
