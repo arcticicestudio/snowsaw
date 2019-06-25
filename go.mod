@@ -4,5 +4,9 @@ go 1.12
 
 require (
 	github.com/fatih/color v1.7.0
+	github.com/ghodss/yaml v1.0.0
+	github.com/imdario/mergo v0.3.7
 	github.com/mattn/go-colorable v0.1.2 // indirect
+	github.com/mitchellh/go-homedir v1.1.0
+	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
