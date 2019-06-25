@@ -5,6 +5,15 @@
 # Repository: https://github.com/arcticicestudio/snowsaw
 # License:    MIT
 
+# +--------------------+
+# + JetBrains Products +
+# +--------------------+
+# +--- IntelliJ IDEA ---+
+.idea/*
+!.idea/runConfigurations
+!.idea/saved-exports
+!.idea/watcherTasks.xml
+
 # +------+
 # + Logs +
 # +------+
