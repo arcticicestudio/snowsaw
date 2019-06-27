@@ -304,7 +304,7 @@ Defaults are specified as a dictionary mapping action names to settings, which a
 snowsaw is developed using one of the awesome tools from JetBrains called [PyCharm](https://www.jetbrains.com/pycharm).
 The project files are located in the [`.idea`](https://github.com/arcticicestudio/snowsaw/tree/develop/.idea) directory.
 
-The included [run/debug configurations](https://www.jetbrains.com/help/pycharm/run-debug-configurations.html) for the script must be manually adjusted to match the paths to the main [`snmowsaw`](https://github.com/arcticicestudio/snowsaw/blob/develop/bin/snowsaw) script and the path parameter for the `-s` / `--snowblocks-directory` CLI option.
+The included [run/debug configurations](https://www.jetbrains.com/help/pycharm/run-debug-configurations.html) for the script must be manually adjusted to match the paths to the main [`snowsaw`](https://github.com/arcticicestudio/snowsaw/blob/develop/bin/snowsaw) script and the path parameter for the `-s` / `--snowblocks-directory` CLI option.
 ![][scrot-readme-debugging-run-configuration]
 
 snowsaw can [run](https://www.jetbrains.com/help/pycharm/running-applications.html) in the debug mode by using the bug icon or from the menu via *Run* -> *Debug 'snowsaw'*.
