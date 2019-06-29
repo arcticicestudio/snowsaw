@@ -26,3 +26,8 @@ npm-debug.log*
 # +---------+
 .npm/
 **/node_modules/
+
+# +-------------------+
+# + Project Structure +
+# +-------------------+
+build/

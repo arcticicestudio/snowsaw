@@ -1,0 +1,82 @@
+# Copyright (C) 2017-present Arctic Ice Studio <development@arcticicestudio.com>
+# Copyright (C) 2017-present Sven Greb <development@svengreb.de>
+#
+# Project:    snowsaw
+# Repository: https://github.com/arcticicestudio/snowsaw
+# License:    MIT
+
+# Configuration for golangci-lint as well as the golangci.com service.
+# See the official documentations for more details:
+#   https://github.com/golangci/golangci-lint#configuration
+#   https://github.com/golangci/golangci/wiki/Configuration
+
+issues:
+  exclude-rules:
+    - linters:
+        - lll
+      source: "^//go:generate "
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+linters:
+  enable-all: true
+  disable:
+    - depguard
+    - gochecknoglobals
+    - gochecknoinits
+    - maligned
+    - prealloc
+
+linters-settings:
+  dupl:
+    # Minimum count of tokens before triggering as duplicate code.
+    threshold: 100
+
+  errcheck:
+    # Report about not checking of errors in type assertions.
+    # Example: `a := b.(CustomStruct)`
+    check-type-assertions: true
+
+  goconst:
+    min-len: 2
+    min-occurrences: 3
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - performance
+      - style
+
+  goimports:
+    # A comma-separated list of prefixes for local package imports to be put after 3rd-party packages.
+    local-prefixes: github.com/arcticicestudio/snowsaw
+
+  golint:
+    min-confidence: 0.0
+
+  govet:
+    check-shadowing: true
+    # See `go tool vet help [ANALYZER]` for more details about available analyzers and their settings.
+    settings:
+      printf:
+        # Register custom functions to be included in the analyse.
+        funcs:
+          - (github.com/arcticicestudio/snowsaw/pkg/prt).Debugf
+          - (github.com/arcticicestudio/snowsaw/pkg/prt).Infof
+          - (github.com/arcticicestudio/snowsaw/pkg/prt).Successf
+          - (github.com/arcticicestudio/snowsaw/pkg/prt).Warnf
+          - (github.com/arcticicestudio/snowsaw/pkg/prt).Errorf
+          - (github.com/arcticicestudio/snowsaw/pkg/prt).Fatalf
+
+  lll:
+    line-length: 160
+
+  misspell:
+    locale: US
+
+run:
+  deadline: 15m
+
+service:
+  golangci-lint-version: 1.17.x
