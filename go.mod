@@ -8,6 +8,7 @@ require (
 	github.com/magefile/mage v1.8.0
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/mitchellh/mapstructure v1.1.2
 	github.com/spf13/cobra v0.0.5
 	gopkg.in/yaml.v3 v3.0.0-20190709130402-674ba3eaed22
 )

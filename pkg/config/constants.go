@@ -15,6 +15,7 @@ import (
 	"github.com/arcticicestudio/snowsaw/pkg/api/snowblock"
 	"github.com/arcticicestudio/snowsaw/pkg/config/source/file"
 	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task"
+	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task/link"
 )
 
 const (
@@ -38,7 +39,9 @@ var (
 	// AppConfigPaths is the default paths the application will search for configuration files.
 	AppConfigPaths []*file.File
 
-	availableTaskRunner []snowblock.TaskRunner
+	availableTaskRunner = []snowblock.TaskRunner{
+		&link.Link{},
+	}
 
 	// BuildDateTime is the date and time this application was build.
 	BuildDateTime string
