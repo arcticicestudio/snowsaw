@@ -22,6 +22,7 @@ import (
 
 	"github.com/arcticicestudio/snowsaw/pkg/config/encoder"
 	"github.com/arcticicestudio/snowsaw/pkg/config/source/file"
+	"github.com/arcticicestudio/snowsaw/pkg/prt"
 )
 
 // Config represents the application-wide configurations.
@@ -43,6 +44,10 @@ type Snowblocks struct {
 
 func init() {
 	AppConfigPaths = genConfigPaths()
+	if err := registerSnowblockTaskRunner(); err != nil {
+		prt.Fatalf("Failed to register snowblock task runner: %v", err)
+		panic(err)
+	}
 }
 
 func genConfigPaths() []*file.File {
@@ -61,4 +66,14 @@ func genConfigPaths() []*file.File {
 	}
 
 	return files
+}
+
+func registerSnowblockTaskRunner() error {
+	for _, runner := range availableTaskRunner {
+		if err := SnowblockTaskRunnerRegistry.Add(runner); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

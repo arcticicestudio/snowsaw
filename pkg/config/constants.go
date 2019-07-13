@@ -12,7 +12,9 @@
 package config
 
 import (
+	"github.com/arcticicestudio/snowsaw/pkg/api/snowblock"
 	"github.com/arcticicestudio/snowsaw/pkg/config/source/file"
+	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task"
 )
 
 const (
@@ -36,8 +38,13 @@ var (
 	// AppConfigPaths is the default paths the application will search for configuration files.
 	AppConfigPaths []*file.File
 
+	availableTaskRunner []snowblock.TaskRunner
+
 	// BuildDateTime is the date and time this application was build.
 	BuildDateTime string
+
+	// SnowblockTaskRunnerRegistry is the application-wide registry for snowblock task runner.
+	SnowblockTaskRunnerRegistry = task.NewRegistry()
 
 	// Version is the application version.
 	Version = "0.0.0"
