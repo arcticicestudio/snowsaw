@@ -53,28 +53,16 @@ func init() {
 func genConfigPaths() []*file.File {
 	var files []*file.File
 
-	// Include user-level dot-file configurations from the user's home directory.
+	// Include the user-level dotfile configuration from user's home directory.
 	home, err := homedir.Dir()
 	if err == nil {
-		for _, ext := range encoder.ExtensionsJson {
-			files = append(files, file.NewFile(filepath.Join(home, fmt.Sprintf(".%s.%s", ProjectName, ext))))
-		}
-		// Since YAML is a superset of JSON, YAML files take precedence over pure JSON based configurations.
-		for _, ext := range encoder.ExtensionsYaml {
-			files = append(files, file.NewFile(filepath.Join(home, fmt.Sprintf(".%s.%s", ProjectName, ext))))
-		}
+		files = append(files, file.NewFile(filepath.Join(home, fmt.Sprintf(".%s.%s", ProjectName, encoder.ExtensionsYaml))))
 	}
 
-	// Files placed in the current working directory take precedence over user-level configurations.
+	// A file placed in the current working directory takes precedence over the user-level configuration.
 	pwd, err := os.Getwd()
 	if err == nil {
-		for _, ext := range encoder.ExtensionsJson {
-			files = append(files, file.NewFile(filepath.Join(pwd, fmt.Sprintf("%s.%s", ProjectName, ext))))
-		}
-		// Since YAML is a superset of JSON, YAML files take precedence over pure JSON based configurations.
-		for _, ext := range encoder.ExtensionsYaml {
-			files = append(files, file.NewFile(filepath.Join(pwd, fmt.Sprintf("%s.%s", ProjectName, ext))))
-		}
+		files = append(files, file.NewFile(filepath.Join(pwd, fmt.Sprintf("%s.%s", ProjectName, encoder.ExtensionsYaml))))
 	}
 
 	return files
