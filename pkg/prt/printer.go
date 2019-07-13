@@ -82,6 +82,8 @@ func ParseVerbosityLevel(lvl string) (Verbosity, error) {
 		return ErrorVerbosity, nil
 	case "warn":
 		return WarnVerbosity, nil
+	case "success":
+		return SuccessVerbosity, nil
 	case "info":
 		return InfoVerbosity, nil
 	case "debug":
@@ -99,6 +101,8 @@ func (v Verbosity) MarshalText() ([]byte, error) {
 		return []byte("debug"), nil
 	case InfoVerbosity:
 		return []byte("info"), nil
+	case SuccessVerbosity:
+		return []byte("success"), nil
 	case WarnVerbosity:
 		return []byte("warn"), nil
 	case ErrorVerbosity:
