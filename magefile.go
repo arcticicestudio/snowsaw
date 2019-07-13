@@ -208,7 +208,7 @@ func Test() {
 	mg.SerialDeps(unitTests)
 }
 
-// Test runs all unit tests with enabled race detection.
+// TestCover runs all unit tests with with coverage reports and enabled race detection.
 func TestCover() {
 	mg.SerialDeps(Clean)
 	// Ensure the required directory structure exists, `go test` doesn't create it automatically.
