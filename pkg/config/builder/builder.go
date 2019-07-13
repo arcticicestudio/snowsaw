@@ -16,12 +16,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"reflect"
 
 	"github.com/fatih/color"
 	"github.com/imdario/mergo"
 
+	"github.com/arcticicestudio/snowsaw/pkg/config"
 	"github.com/arcticicestudio/snowsaw/pkg/config/encoder"
+	"github.com/arcticicestudio/snowsaw/pkg/config/encoder/yaml"
 	"github.com/arcticicestudio/snowsaw/pkg/config/source/file"
 	"github.com/arcticicestudio/snowsaw/pkg/prt"
 	"github.com/arcticicestudio/snowsaw/pkg/util/filesystem"
@@ -33,71 +34,63 @@ type builder struct {
 }
 
 // Load tries to load all given configuration files.
-// It checks if the path is valid and exists, tries to assign a matching encoder.Encoder based on the file extension and
-// returns a pointer to a builder to chain and pass the loaded files to the Merge function.
+// It checks if the path is valid and exists, tries to assign a matching encoder based on the file extension and returns
+// a pointer to a builder to chain the merge function.
 func Load(files ...*file.File) *builder {
-	s := &builder{Files: []*file.File{}}
+	b := &builder{Files: []*file.File{}}
 
 	for _, f := range files {
-		// Convert to absolute path and check if file exists, otherwise ignore and check next.
-		f.Path, _ = filepath.Abs(f.Path)
-		if exists, _ := filesystem.FileExists(f.Path); !exists {
+		// Convert to an absolute path and check if the file exists, otherwise ignore and check next.
+		absPath, absPathErr := filepath.Abs(f.Path)
+		if absPathErr != nil {
+			prt.Debugf("Could not convert to absolute configuration file path: %v", absPathErr)
+			continue
+		}
+		if exists, _ := filesystem.FileExists(absPath); !exists {
 			prt.Debugf("Ignoring non-existent configuration file: %s", color.CyanString(f.Path))
 			continue
 		}
+		f.Path = absPath
 
-		// Find matching encoder by file extension if not already set.
-		if f.Encoder == nil {
-			fileExt := filepath.Ext(f.Path)
-			if len(fileExt) <= 1 {
-				prt.Debugf("Ignoring configuration file without supported extension: %s", color.CyanString(f.Path))
-				continue
-			}
-
-			// Strip dot character separating the file name and extension.
-			fileExt = fileExt[1:]
-
-			// Only add files with supported encoders.
-			for ext, enc := range encoder.ExtensionMapping {
-				if ext == fileExt {
-					f.Encoder = enc
-					s.Files = append(s.Files, f)
-					break
-				}
-			}
-		} else {
-			s.Files = append(s.Files, f)
+		fileExt := filepath.Ext(f.Path)
+		// Check if the file matches the supported YAML extension...
+		if len(fileExt) <= 1 || fileExt[1:] != encoder.ExtensionsYaml {
+			prt.Debugf("Ignoring configuration file without supported extension: %s", color.CyanString(f.Path))
+			continue
+		}
+		// ...when trimming the dot character that separates the file name and extension.
+		if fileExt[1:] == encoder.ExtensionsYaml {
+			f.Encoder = yaml.NewYamlEncoder()
+			b.Files = append(b.Files, f)
 		}
 	}
 
-	return s
+	return b
 }
 
 // Into accepts a configuration struct pointer and populates it with the current config state.
-// The order of the files array is maintained when merging the configuration states into the struct is enabled.
-func (s *builder) Into(c interface{}, merge bool) error {
-	base := reflect.New(reflect.TypeOf(c).Elem()).Interface()
-
-	for _, f := range s.Files {
+// The order of the files are maintained when merging of the configuration states is enabled.
+func (b *builder) Into(c *config.Config, merge bool) error {
+	for _, f := range b.Files {
 		content, err := ioutil.ReadFile(f.Path)
 		if err != nil {
 			return err
 		}
 
 		if !merge {
-			// Decode the file content into the given base configuration state using the assigned encoder...
+			// Decode the file content into the given configuration state using the assigned encoder...
 			if encErr := f.Encoder.Decode(content, &c); encErr != nil {
 				return fmt.Errorf("%s: %v", f.Path, encErr)
 			}
 			continue
 		}
 
-		// ...or merge into the given base configuration state.
-		raw := base
-		if encErr := f.Encoder.Decode(content, &raw); encErr != nil {
+		newState := &config.Config{}
+		// ...or merge into the given encoded configuration state.
+		if encErr := f.Encoder.Decode(content, &newState); encErr != nil {
 			return fmt.Errorf("%s: %v", f.Path, encErr)
 		}
-		if encErr := mergo.Merge(c, raw, mergo.WithAppendSlice, mergo.WithOverride); encErr != nil {
+		if encErr := mergo.Merge(c, newState, mergo.WithAppendSlice, mergo.WithOverride); encErr != nil {
 			return fmt.Errorf("%s: %v", f.Path, encErr)
 		}
 	}

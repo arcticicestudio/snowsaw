@@ -13,7 +13,7 @@
 package yaml
 
 import (
-	"github.com/ghodss/yaml"
+	"gopkg.in/yaml.v3"
 )
 
 // Encoder represents a YAML configuration file encoder.

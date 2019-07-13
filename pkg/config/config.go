@@ -27,18 +27,18 @@ import (
 // Config represents the application-wide configurations.
 type Config struct {
 	// LogLevel is the application-wide logging verbosity level.
-	LogLevel string `json:"logLevel" yaml:"logLevel"`
+	LogLevel string `yaml:"logLevel"`
 
 	// Snowblocks are general snowblocks configurations.
-	Snowblocks Snowblocks `json:"snowblocks,flow" yaml:"snowblocks,flow"`
+	Snowblocks Snowblocks `yaml:"snowblocks,flow"`
 }
 
 // Snowblocks represents the general snowblocks configurations.
 type Snowblocks struct {
 	// BaseDirs are the paths of the snowblock base directories.
-	BaseDirs []string `json:"baseDirs,flow" yaml:"baseDirs,flow"`
+	BaseDirs []string `yaml:"baseDirs,flow"`
 	// Paths are the paths of the snowblocks directories.
-	Paths []string `json:"paths,flow" yaml:"paths,flow"`
+	Paths []string `yaml:"paths,flow"`
 }
 
 func init() {
