@@ -19,6 +19,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
+	"github.com/arcticicestudio/snowsaw/cmd/snowsaw/bootstrap"
 	"github.com/arcticicestudio/snowsaw/cmd/snowsaw/info"
 	"github.com/arcticicestudio/snowsaw/pkg/config"
 	"github.com/arcticicestudio/snowsaw/pkg/config/builder"
