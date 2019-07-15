@@ -101,8 +101,8 @@ func (s *Snowblock) Validate(taskRunner map[string]api.TaskRunner) error {
 	// Try to read and encode the task objects when the directory contains a configuration file.
 	configFilePath := filepath.Join(s.Path, fmt.Sprintf("%s.%s", api.ConfigurationFileName, encoder.ExtensionsJson))
 	if configLoadErr := loadConfigFile(configFilePath, &s.TaskObjects); configLoadErr != nil {
-		prt.Debugf("Ignoring snowblock directory %s without valid configuration file: %s: %v",
-			color.CyanString(filepath.Base(s.Path)), color.BlueString(configFilePath), configLoadErr)
+		prt.Debugf("Ignoring snowblock directory %s: %v",
+			color.CyanString(filepath.Base(s.Path)), configLoadErr)
 		return nil
 	}
 

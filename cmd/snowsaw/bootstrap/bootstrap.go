@@ -37,31 +37,30 @@ func NewBootstrapCmd() *cobra.Command {
 	bootstrapCmd := &cobra.Command{
 		Use:   "bootstrap",
 		Short: "Bootstraps all configured snowblocks",
+		Long: `Bootstraps all configured snowblocks
+To process individual snowblocks a list of space-separated paths can be passed as arguments.
+		`,
 		Run: func(cmd *cobra.Command, args []string) {
 			o.prepare(cmd, args)
 			o.run(cmd, args)
 		},
 	}
-
-	bootstrapCmd.Flags().StringSliceVarP(
-		&o.SnowblockPaths, "snowblocks", "s", []string{}, "comma-separated paths to individual snowblock directories")
-
 	return bootstrapCmd
 }
 
 func (o *cmdOptions) prepare(cmd *cobra.Command, args []string) {
 	// Use explicit snowblocks if specified, otherwise find all snowblocks within the base directories.
-	if len(o.SnowblockPaths) > 0 {
+	if len(args) > 0 {
 		prt.Debugf("Using individual snowblocks instead of configured base directories(s): %s",
-			color.CyanString("%v", o.SnowblockPaths))
-		config.AppConfig.Snowblocks.Paths = o.SnowblockPaths
+			color.CyanString("%v", args))
+		config.AppConfig.Snowblocks.Paths = args
 	} else {
 		if err := o.readSnowblockDirectories(); err != nil {
 			prt.Errorf("Failed to read snowblocks from base directories: %v", err)
 			os.Exit(1)
 		}
-		o.SnowblockPaths = config.AppConfig.Snowblocks.Paths
 	}
+	o.SnowblockPaths = config.AppConfig.Snowblocks.Paths
 }
 
 func (o *cmdOptions) readSnowblockDirectories() error {
