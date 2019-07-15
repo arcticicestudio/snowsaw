@@ -72,7 +72,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&explicitConfigFilePath, "config", "", "path to the configuration file")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug information output")
 	rootCmd.PersistentFlags().StringSliceVarP(
-		&snowblockBaseDirs, "basedirs", "b", config.AppConfig.Snowblocks.Paths,
+		&snowblockBaseDirs, "basedirs", "b", config.AppConfig.Snowblocks.BaseDirs,
 		"comma-separated paths to snowblock base directories")
 
 	// Set the app version information for the automatically generated `version` flag.
