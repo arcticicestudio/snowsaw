@@ -15,6 +15,7 @@ import (
 	"github.com/arcticicestudio/snowsaw/pkg/api/snowblock"
 	"github.com/arcticicestudio/snowsaw/pkg/config/source/file"
 	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task"
+	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task/clean"
 	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task/link"
 )
 
@@ -40,6 +41,7 @@ var (
 	AppConfigPaths []*file.File
 
 	availableTaskRunner = []snowblock.TaskRunner{
+		&clean.Clean{},
 		&link.Link{},
 	}
 
