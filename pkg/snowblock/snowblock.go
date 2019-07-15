@@ -43,7 +43,7 @@ type Snowblock struct {
 	TaskObjects []api.Task
 
 	// TaskRunnerMapping contains the assignments from task objects to a matching task runner.
-	TaskRunnerMapping map[api.TaskRunner]api.TaskConfiguration
+	TaskRunnerMapping map[api.TaskRunner][]api.TaskConfiguration
 
 	// UnsupportedTasks is a list of task names that are not supported by an registered task runner.
 	UnsupportedTasks []api.TaskConfiguration
@@ -54,7 +54,7 @@ func NewSnowblock(path string) *Snowblock {
 	return &Snowblock{
 		Path:              path,
 		TaskObjects:       make([]api.Task, 0),
-		TaskRunnerMapping: make(map[api.TaskRunner]api.TaskConfiguration),
+		TaskRunnerMapping: make(map[api.TaskRunner][]api.TaskConfiguration),
 	}
 }
 
@@ -62,8 +62,10 @@ func NewSnowblock(path string) *Snowblock {
 // handle it.
 func (s *Snowblock) Dispatch() error {
 	for runner, instructions := range s.TaskRunnerMapping {
-		if err := runner.Run(instructions, s.Path); err != nil {
-			return err
+		for _, taskConfig := range instructions {
+			if err := runner.Run(taskConfig, s.Path); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -109,7 +111,7 @@ func (s *Snowblock) Validate(taskRunner map[string]api.TaskRunner) error {
 		for taskName, taskConfigMap := range taskObject {
 			runner, exists := taskRunner[taskName]
 			if exists {
-				s.TaskRunnerMapping[runner] = taskConfigMap
+				s.TaskRunnerMapping[runner] = append(s.TaskRunnerMapping[runner], taskConfigMap)
 				continue
 			}
 			s.UnsupportedTasks = append(s.UnsupportedTasks, taskName)
