@@ -17,6 +17,7 @@ import (
 	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task"
 	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task/clean"
 	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task/link"
+	"github.com/arcticicestudio/snowsaw/pkg/snowblock/task/shell"
 )
 
 const (
@@ -43,6 +44,7 @@ var (
 	availableTaskRunner = []snowblock.TaskRunner{
 		&clean.Clean{},
 		&link.Link{},
+		&shell.Shell{},
 	}
 
 	// BuildDateTime is the date and time this application was build.
