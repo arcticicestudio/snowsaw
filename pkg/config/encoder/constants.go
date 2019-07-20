@@ -19,11 +19,11 @@ import (
 var (
 	// ExtensionMapping maps supported file extensions to their compatible encoders.
 	ExtensionMapping = map[string]Encoder{
-		ExtensionsJson: json.NewJsonEncoder(),
+		ExtensionsJSON: json.NewJSONEncoder(),
 		ExtensionsYaml: yaml.NewYamlEncoder(),
 	}
-	// ExtensionsJson is the supported extension for files containing JSON data.
-	ExtensionsJson = "json"
+	// ExtensionsJSON is the supported extension for files containing JSON data.
+	ExtensionsJSON = "json"
 	// ExtensionsYaml is the supported extension for files containing YAML data.
 	ExtensionsYaml = "yml"
 )

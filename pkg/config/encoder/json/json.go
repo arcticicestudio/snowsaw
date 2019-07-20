@@ -30,7 +30,7 @@ func (j Encoder) Decode(d []byte, v interface{}) error {
 	return json.Unmarshal(d, v)
 }
 
-// NewJsonEncoder returns a new JSON Encoder.
-func NewJsonEncoder() Encoder {
+// NewJSONEncoder returns a new JSON Encoder.
+func NewJSONEncoder() Encoder {
 	return Encoder{}
 }

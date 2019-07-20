@@ -425,6 +425,7 @@ func runGolangCILint() {
 		prt.Errorf("Linters finished with non-zero exit code")
 		os.Exit(1)
 	}
+	prt.Successf("Linters finished successfully with zero exit code")
 }
 
 func runGoTest(testFlags ...string) {

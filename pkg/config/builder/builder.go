@@ -28,16 +28,16 @@ import (
 	"github.com/arcticicestudio/snowsaw/pkg/util/filesystem"
 )
 
-// builder contains the current configuration building state.
-type builder struct {
+// Builder contains the current configuration building state.
+type Builder struct {
 	Files []*file.File
 }
 
 // Load tries to load all given configuration files.
 // It checks if the path is valid and exists, tries to assign a matching encoder based on the file extension and returns
 // a pointer to a builder to chain the merge function.
-func Load(files ...*file.File) *builder {
-	b := &builder{Files: []*file.File{}}
+func Load(files ...*file.File) *Builder {
+	b := &Builder{Files: []*file.File{}}
 
 	for _, f := range files {
 		// Convert to an absolute path and check if the file exists, otherwise ignore and check next.
@@ -70,7 +70,7 @@ func Load(files ...*file.File) *builder {
 
 // Into accepts a configuration struct pointer and populates it with the current config state.
 // The order of the files are maintained when merging of the configuration states is enabled.
-func (b *builder) Into(c *config.Config, merge bool) error {
+func (b *Builder) Into(c *config.Config, merge bool) error {
 	for _, f := range b.Files {
 		content, err := ioutil.ReadFile(f.Path)
 		if err != nil {

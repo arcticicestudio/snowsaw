@@ -99,7 +99,7 @@ func (s *Snowblock) Validate(taskRunner map[string]api.TaskRunner) error {
 	s.Path = expandedAbsPath
 
 	// Try to read and encode the task objects when the directory contains a configuration file.
-	configFilePath := filepath.Join(s.Path, fmt.Sprintf("%s.%s", api.ConfigurationFileName, encoder.ExtensionsJson))
+	configFilePath := filepath.Join(s.Path, fmt.Sprintf("%s.%s", api.ConfigurationFileName, encoder.ExtensionsJSON))
 	if configLoadErr := loadConfigFile(configFilePath, &s.TaskObjects); configLoadErr != nil {
 		prt.Debugf("Ignoring snowblock directory %s: %v",
 			color.CyanString(filepath.Base(s.Path)), configLoadErr)
@@ -124,7 +124,7 @@ func (s *Snowblock) Validate(taskRunner map[string]api.TaskRunner) error {
 }
 
 func loadConfigFile(absPath string, tasks *[]api.Task) error {
-	f := file.NewFile(absPath).WithEncoder(json.NewJsonEncoder())
+	f := file.NewFile(absPath).WithEncoder(json.NewJSONEncoder())
 	// Check if the file exists...
 	if exists, _ := filesystem.FileExists(f.Path); !exists {
 		return fmt.Errorf("no such snowblock configuration file: %s", color.RedString(f.Path))

@@ -118,9 +118,8 @@ func (v Verbosity) MarshalText() ([]byte, error) {
 func (v Verbosity) String() string {
 	if b, err := v.MarshalText(); err == nil {
 		return string(b)
-	} else {
-		return "unknown"
 	}
+	return "unknown"
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler to unmarshal a textual representation of itself.
@@ -130,7 +129,7 @@ func (v *Verbosity) UnmarshalText(text []byte) error {
 		return err
 	}
 
-	*v = Verbosity(l)
+	*v = l
 	return nil
 }
 
@@ -174,10 +173,10 @@ func (p *printerConfig) isPrinterEnabled(v Verbosity) bool { return p.verbosity 
 func (p *printerConfig) setVerbosityLevel(v Verbosity) { p.verbosity = v }
 
 // withNewLine writes to the specified writer and appends a new line to the given format if not already.
-func (p *printerConfig) withNewLine(v Verbosity, w io.Writer, prefix string, format string, args ...interface{}) {
+func (p *printerConfig) withNewLine(v Verbosity, w io.Writer, prefix, format string, args ...interface{}) {
 	if p.isPrinterEnabled(v) {
 		if !strings.HasSuffix(format, "\n") {
-			format = format + "\n"
+			format += "\n"
 		}
 		fmt.Fprintf(w, prefix+format, args...)
 	}

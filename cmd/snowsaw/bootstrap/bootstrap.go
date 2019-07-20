@@ -41,24 +41,22 @@ func NewBootstrapCmd() *cobra.Command {
 To process individual snowblocks a list of space-separated paths can be passed as arguments.
 		`,
 		Run: func(cmd *cobra.Command, args []string) {
-			o.prepare(cmd, args)
-			o.run(cmd, args)
+			o.prepare(args)
+			o.run()
 		},
 	}
 	return bootstrapCmd
 }
 
-func (o *cmdOptions) prepare(cmd *cobra.Command, args []string) {
+func (o *cmdOptions) prepare(args []string) {
 	// Use explicit snowblocks if specified, otherwise find all snowblocks within the base directories.
 	if len(args) > 0 {
 		prt.Debugf("Using individual snowblocks instead of configured base directories(s): %s",
 			color.CyanString("%v", args))
 		config.AppConfig.Snowblocks.Paths = args
-	} else {
-		if err := o.readSnowblockDirectories(); err != nil {
-			prt.Errorf("Failed to read snowblocks from base directories: %v", err)
-			os.Exit(1)
-		}
+	} else if err := o.readSnowblockDirectories(); err != nil {
+		prt.Errorf("Failed to read snowblocks from base directories: %v", err)
+		os.Exit(1)
 	}
 	o.SnowblockPaths = config.AppConfig.Snowblocks.Paths
 }
@@ -97,7 +95,7 @@ func (o *cmdOptions) readSnowblockDirectories() error {
 	return nil
 }
 
-func (o *cmdOptions) run(cmd *cobra.Command, args []string) {
+func (o *cmdOptions) run() {
 	for _, path := range o.SnowblockPaths {
 		sb := snowblock.NewSnowblock(path)
 		err := sb.Validate(config.SnowblockTaskRunnerRegistry.GetAll())

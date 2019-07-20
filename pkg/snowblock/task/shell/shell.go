@@ -162,7 +162,7 @@ func (s *Shell) execute() error {
 
 func (s *Shell) parseCommand(cmd string) error {
 	parts := strings.Split(strings.TrimSpace(cmd), " ")
-	if len(parts[0]) == 0 {
+	if parts[0] == "" {
 		return fmt.Errorf("shell command must not be empty or whitespace-only")
 	}
 
