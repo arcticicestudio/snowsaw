@@ -1,3 +1,18 @@
+<p align="center"><img src="https://user-images.githubusercontent.com/7836623/59827422-f5a20b00-9338-11e9-9a53-34cacc567e9e.png" width="320px" /></p>
+
+<h2 align="center">snowsaw is <a href="https://github.com/arcticicestudio/snowsaw/tree/epic/gh-33-the-way-to-go">currently being rewritten</a> from scratch in <a href="https://golang.org">Go</a>!</h2>
+
+<p align="center">Please <a href="https://github.com/arcticicestudio/snowsaw/issues/33">see the roadmap and epic ticket #33</a> for more details and information about the <strong>backwards compatibility</strong> with this original Python implementation as well as <strong>migration strategies</strong>, planned <strong>features and improvements</strong> and the <strong>overall project goals</strong>.</p>
+
+<p align="center">
+  <div align="center"><img src="https://user-images.githubusercontent.com/7836623/62348122-4ee68800-b4fc-11e9-9c08-2ad29bd77693.png" width="16" /> <a href="https://github.com/arcticicestudio/snowsaw/issues/33">Read all about the rewrite and project future plans</a></div>
+  <div align="center"><img src="https://user-images.githubusercontent.com/7836623/62347724-ea76f900-b4fa-11e9-8be6-492280cc3da5.png" width="24" /> <a href="https://github.com/arcticicestudio/snowsaw/tree/epic/gh-33-the-way-to-go">Browse the current Go implementation branch</a></div>
+</p>
+
+<p align="center">Please <strong>report any bug you encounter when testing the new Go implementation</strong> to help making the project more stable and read for production. Every feedback is always welcome!</p>
+
+---
+
 <p align="center"><img src="https://cdn.rawgit.com/arcticicestudio/snowsaw/develop/assets/snowsaw-banner.svg"/></p>
 
 <p align="center"><img src="https://assets-cdn.github.com/favicon.ico" width=24 height=24/> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/github/release/arcticicestudio/snowsaw.svg"/></a> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/badge/pre--release---_-blue.svg"/></a> <img src="https://www.python.org/static/favicon.ico" width=24 height=24/> <img src="https://img.shields.io/badge/Python-3.5+-blue.svg"/></p>
