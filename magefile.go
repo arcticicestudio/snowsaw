@@ -83,7 +83,7 @@ var (
 	// See https://github.com/mitchellh/gox for more details.
 	crossCompileTool = &buildDependency{
 		BinaryName:  "gox",
-		PackageName: "github.com/mitchellh/gox",
+		PackageName: "github.com/mitchellh/gox@v1.0.1",
 	}
 
 	// The tool used to format all Go source files.
@@ -110,7 +110,7 @@ var (
 	// This is the same tool used by the https://golangci.com service that is also integrated in snowsaw's CI/CD pipeline.
 	// See https://github.com/golangci/golangci-lint for more details.
 	lintTool = &buildDependency{
-		PackageName: "github.com/golangci/golangci-lint/cmd/golangci-lint",
+		PackageName: "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.19.1",
 		BinaryName:  "golangci-lint",
 	}
 
