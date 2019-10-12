@@ -110,7 +110,7 @@ var (
 	// This is the same tool used by the https://golangci.com service that is also integrated in snowsaw's CI/CD pipeline.
 	// See https://github.com/golangci/golangci-lint for more details.
 	lintTool = &buildDependency{
-		PackageName: "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.17.1",
+		PackageName: "github.com/golangci/golangci-lint/cmd/golangci-lint",
 		BinaryName:  "golangci-lint",
 	}
 
@@ -474,8 +474,16 @@ func validateBuildDependencies() {
 			continue
 		}
 
+		env := map[string]string{
+			// Disable module mode to install development dependencies to prevent to pollute the project module file.
+			// This is a necessary workaround until the Go toolchain is able to install packages globally without
+			// updating the module file when the "go get" command is run from within the project root directory.
+			// See https://github.com/golang/go/issues/30515 for more details or more details and proposed solutions
+			// that might be added to Go's build tools in future versions.
+			"GO111MODULE": "off"}
+
 		prt.Infof("Installing required build dependency: %s", color.CyanString(bd.PackageName))
-		if err = sh.Run(goExec, "get", "-u", bd.PackageName); err != nil {
+		if err = sh.RunWith(env, goExec, "get", "-u", bd.PackageName); err != nil {
 			prt.Errorf("Failed to install required build dependency %s: %v", color.CyanString(bd.PackageName), err)
 			prt.Warnf("Please install manually: %s", color.CyanString("go get -u %s", bd.PackageName))
 			os.Exit(1)
