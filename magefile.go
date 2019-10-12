@@ -75,7 +75,6 @@ var (
 	// Also see the source of the `build` command: https://github.com/golang/go/blob/master/src/cmd/dist/build.go
 	crossCompileTargetPlatforms = []string{
 		"darwin/amd64",
-		"freebsd/amd64",
 		"linux/amd64",
 		"windows/amd64",
 	}
