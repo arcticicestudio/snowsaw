@@ -474,16 +474,22 @@ func validateBuildDependencies() {
 			continue
 		}
 
-		env := map[string]string{
-			// Disable module mode to install development dependencies to prevent to pollute the project module file.
-			// This is a necessary workaround until the Go toolchain is able to install packages globally without
-			// updating the module file when the "go get" command is run from within the project root directory.
-			// See https://github.com/golang/go/issues/30515 for more details or more details and proposed solutions
-			// that might be added to Go's build tools in future versions.
-			"GO111MODULE": "off"}
-
 		prt.Infof("Installing required build dependency: %s", color.CyanString(bd.PackageName))
-		if err = sh.RunWith(env, goExec, "get", "-u", bd.PackageName); err != nil {
+		c := exec.Command(goExec, "get", "-u", bd.PackageName)
+		// Run installations outside of the project root directory to prevent the pollution of the project's Go module
+		// file.
+		// This is a necessary workaround until the Go toolchain is able to install packages globally without
+		// updating the module file when the "go get" command is run from within the project root directory.
+		// See https://github.com/golang/go/issues/30515 for more details or more details and proposed solutions
+		// that might be added to Go's build tools in future versions.
+		c.Dir = os.TempDir()
+		c.Env = os.Environ()
+		// Explicitly enable "module" mode to install development dependencies to allow to use pinned module versions.
+		env := map[string]string{"GO111MODULE": "on"}
+		for k, v := range env {
+			c.Env = append(c.Env, k+"="+v)
+		}
+		if err = c.Run(); err != nil {
 			prt.Errorf("Failed to install required build dependency %s: %v", color.CyanString(bd.PackageName), err)
 			prt.Warnf("Please install manually: %s", color.CyanString("go get -u %s", bd.PackageName))
 			os.Exit(1)
