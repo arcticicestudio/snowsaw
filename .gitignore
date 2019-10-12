@@ -19,12 +19,16 @@
 # +------+
 **/*.log
 logs/
+.npm/
 npm-debug.log*
+npm-error.log*
+yarn-debug.log*
+yarn-error.log*
+.yarn-integrity
 
 # +---------+
 # + Node.js +
 # +---------+
-.npm/
 **/node_modules/
 
 # +-------------------+
