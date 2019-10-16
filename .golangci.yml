@@ -79,4 +79,4 @@ run:
   deadline: 15m
 
 service:
-  golangci-lint-version: 1.17.x
+  golangci-lint-version: 1.19.x

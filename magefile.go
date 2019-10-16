@@ -38,12 +38,14 @@ import (
 
 // buildDependency represents a build dependency like a tool used to build or develop the project.
 type buildDependency struct {
-	// The path of the binary executable.
+	// BinaryExecPath is the path of the binary executable.
 	BinaryExecPath string
-	// The name of the binary.
+	// BinaryName is the name of the binary.
 	BinaryName string
-	// The name of the package.
-	PackageName string
+	// ModuleName is the name of the module.
+	ModuleName string
+	// ModuleVersion is the version of the module including prefixes like "v" if any.
+	ModuleVersion string
 }
 
 const (
@@ -83,14 +85,33 @@ var (
 	// See https://github.com/mitchellh/gox for more details.
 	crossCompileTool = &buildDependency{
 		BinaryName:  "gox",
-		PackageName: "github.com/mitchellh/gox@v1.0.1",
+		ModuleName: "github.com/mitchellh/gox",
+		ModuleVersion: "v1.0.1",
+	}
+
+	// devToolManager is the tool to install and run all used project tools and applications with Go's module mode.
+	// This is necessary because the Go toolchain currently doesn't support the handling of local or global project tool
+	// dependencies in module mode without "polluting" the project's Go module file (go.mod).
+	//
+	// See the FAQ/documentations of "gobin" as well as issue references for more details about the tool and its purpose:
+	// https://github.com/myitcv/gobin/wiki/FAQ
+	//
+	// For more details about the status of proposed official Go toolchain solutions and workarounds see the following
+	// references:
+	//   - https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module
+	//   - https://github.com/golang/go/issues/27653
+	//   - https://github.com/golang/go/issues/25922
+	devToolManager = &buildDependency{
+		BinaryName:    "gobin",
+		ModuleName:    "github.com/myitcv/gobin",
+		ModuleVersion: "v0.0.13",
 	}
 
 	// The tool used to format all Go source files.
 	// See https://godoc.org/golang.org/x/tools/cmd/goimports for more details.
 	formatTool = &buildDependency{
-		PackageName: "golang.org/x/tools/cmd/goimports",
 		BinaryName:  "goimports",
+		ModuleName: "golang.org/x/tools/cmd/goimports",
 	}
 
 	// Arguments for the `-gcflags` flag to pass on each `go tool compile` invocation.
@@ -110,8 +131,9 @@ var (
 	// This is the same tool used by the https://golangci.com service that is also integrated in snowsaw's CI/CD pipeline.
 	// See https://github.com/golangci/golangci-lint for more details.
 	lintTool = &buildDependency{
-		PackageName: "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.19.1",
 		BinaryName:  "golangci-lint",
+		ModuleName: "github.com/golangci/golangci-lint/cmd/golangci-lint",
+		ModuleVersion: "v1.19.1",
 	}
 
 	// The output directory for reports like test coverage.
@@ -149,9 +171,14 @@ func init() {
 	goPath = value
 }
 
+// Bootstrap bootstraps the local development environment by installing the required tools and build dependencies.
+func Bootstrap() {
+	mg.SerialDeps(bootstrap)
+}
+
 // Build compiles the project in development mode for the current OS and architecture type.
 func Build() {
-	mg.SerialDeps(Clean, compile)
+	mg.SerialDeps(clean, compile)
 }
 
 // Clean removes previous development and distribution builds from the project root.
@@ -164,14 +191,14 @@ func Clean() {
 // version information via LDFLAGS.
 // Run `strings <PATH_TO_BINARY> | grep "$PWD"` to verify that all paths have been successfully stripped.
 func Dist() {
-	mg.SerialDeps(Clean, validateBuildDependencies, compileProd)
+	mg.SerialDeps(validateDevTools, clean, compileProd)
 }
 
 // DistCrossPlatform builds the project in production mode for cross-platform distribution.
 // This includes all steps from the current platform distribution/production task `Dist`,
 // but instead builds for all configured OS/architecture types.
 func DistCrossPlatform() {
-	mg.SerialDeps(Clean, validateBuildDependencies, compileProdCross)
+	mg.SerialDeps(validateDevTools, clean, compileProdCross)
 }
 
 // DistCrossPlatformOpt builds the project in production mode for cross-platform distribution with optimizations.
@@ -179,7 +206,7 @@ func DistCrossPlatform() {
 // debug metadata to shrink the memory overhead and file size as well as reducing the chance for possible security
 // related problems due to enabled development features and leaked debug information.
 func DistCrossPlatformOpt() {
-	mg.SerialDeps(Clean, validateBuildDependencies, compileProdCrossOpt)
+	mg.SerialDeps(validateDevTools, clean, compileProdCrossOpt)
 }
 
 // DistOpt builds the project in production mode with optimizations like minification and debug symbol stripping.
@@ -187,19 +214,19 @@ func DistCrossPlatformOpt() {
 // the memory overhead and file size as well as reducing the chance for possible security related problems due to
 // enabled development features and leaked debug information.
 func DistOpt() {
-	mg.SerialDeps(Clean, validateBuildDependencies, compileProdOpt)
+	mg.SerialDeps(validateDevTools, clean, compileProdOpt)
 }
 
 // Format searches all project Go source files and formats them according to the Go code styleguide.
 func Format() {
-	mg.SerialDeps(validateBuildDependencies, runGoImports)
+	mg.SerialDeps(validateDevTools, runGoImports)
 }
 
 // Lint runs all linters configured and executed through `golangci-lint`.
 // See the `.golangci.yml` configuration file and official GolangCI documentations at https://golangci.com
 // and https://github.com/golangci/golangci-lint for more details.
 func Lint() {
-	mg.SerialDeps(validateBuildDependencies, runGolangCILint)
+	mg.SerialDeps(validateDevTools, runGolangCILint)
 }
 
 // Test runs all unit tests with enabled race detection.
@@ -209,7 +236,7 @@ func Test() {
 
 // TestCover runs all unit tests with with coverage reports and enabled race detection.
 func TestCover() {
-	mg.SerialDeps(Clean)
+	mg.SerialDeps(clean)
 	// Ensure the required directory structure exists, `go test` doesn't create it automatically.
 	createDirectoryStructure(reportsDir)
 	testCoverageProfileFlag = fmt.Sprintf("-coverprofile=%s", filepath.Join(reportsDir, testCoverageOutputFileName))
@@ -219,6 +246,55 @@ func TestCover() {
 // TestIntegration runs all integration tests with enabled race detection.
 func TestIntegration() {
 	mg.SerialDeps(integrationTests)
+}
+
+func bootstrap() {
+	prt.Infof("Bootstrapping development tool/dependency manager %s",
+		color.CyanString("%s@%s", devToolManager.ModuleName, devToolManager.ModuleVersion))
+	cmdInstallGobin := exec.Command(goExec, "get", "-u",
+		fmt.Sprintf("%s@%s", devToolManager.ModuleName, devToolManager.ModuleVersion))
+	// Run the installation outside of the project root directory to prevent the pollution of the project's Go module
+	// file.
+	// This is a necessary workaround until the Go toolchain is able to install packages globally without
+	// updating the module file when the "go get" command is run from within the project root directory.
+	// See https://github.com/golang/go/issues/30515 for more details or more details and proposed solutions
+	// that might be added to Go's build tools in future versions.
+	cmdInstallGobin.Dir = os.TempDir()
+	cmdInstallGobin.Env = os.Environ()
+	// Explicitly enable "module" mode when installing the dev tool manager to allow to use pinned module version.
+	cmdInstallGobin.Env = append(cmdInstallGobin.Env, "GO111MODULE=on")
+	if gobinInstallErr := cmdInstallGobin.Run(); gobinInstallErr != nil {
+		prt.Errorf("Failed to install required development tool/dependency manager %s:\n  %s",
+			color.CyanString("%s@%s", devToolManager.ModuleName, devToolManager.ModuleVersion),
+			color.RedString("%s", gobinInstallErr))
+		os.Exit(1)
+	}
+
+	prt.Infof("Bootstrapping required development tools/dependencies:")
+	for _, bd := range []*buildDependency{crossCompileTool, formatTool, lintTool} {
+		modulePath := bd.ModuleName
+		// If the non-module dependency is not installed yet, install it normally into the $GOBIN path,...
+		if bd.ModuleVersion == "" {
+			fmt.Println(color.CyanString("  %s", modulePath))
+			if installErr := sh.Run(devToolManager.BinaryName, "-u", modulePath); installErr != nil {
+				prt.Errorf("Failed to install required development tool/dependency %s:\n  %s",
+					color.CyanString(modulePath), color.RedString("%s", installErr))
+				os.Exit(1)
+			}
+			continue
+		}
+
+		// ...otherwise install into "gobin" binary cache.
+		modulePath = fmt.Sprintf("%s@%s", bd.ModuleName, bd.ModuleVersion)
+		fmt.Println(color.CyanString("  %s", modulePath))
+		if installErr := sh.Run(devToolManager.BinaryName, "-u", modulePath); installErr != nil {
+			prt.Errorf("Failed to install required development tool/dependency %s:\n  %s",
+				color.CyanString(modulePath), color.RedString("%s", installErr))
+			os.Exit(1)
+		}
+	}
+
+	prt.Successf("Successfully bootstrapped required development tools/dependencies")
 }
 
 func clean() {
@@ -326,23 +402,32 @@ func getEnvFlags() map[string]string {
 		"Injecting %s:\n"+
 			"  Build Date: %s\n"+
 			"  Version: %s",
-		color.CyanString("LDFLAGS"), color.CyanString(buildDate), color.CyanString(strings.Join(version, "-")))
+		color.BlueString("LDFLAGS"), color.CyanString(buildDate), color.CyanString(strings.Join(version, "-")))
 
 	prt.Infof(
 		"Injecting %s:\n"+
 			"  -trimpath: %s",
-		color.CyanString("ASMFLAGS"), color.CyanString(pwd))
+		color.BlueString("ASMFLAGS"), color.CyanString(pwd))
 
 	prt.Infof(
 		"Injecting %s:\n"+
 			"  -trimpath: %s",
-		color.CyanString("GCFLAGS"), color.CyanString(pwd))
+		color.BlueString("GCFLAGS"), color.CyanString(pwd))
 
 	return map[string]string{
 		"BUILD_DATE_TIME": buildDate,
 		"PACKAGE_NAME":    config.PackageName,
 		"PROJECT_ROOT":    pwd,
 		"VERSION":         strings.Join(version, "-")}
+}
+
+// getExecutablePath returns the path to the executable for the given package/module.
+// When the "resolveWithGobin" parameter is set to true, the path will be resolved from the "gobin" binary cache.
+func getExecutablePath(name string, resolveWithGobin bool) (string, error) {
+	if resolveWithGobin {
+		return sh.Output(devToolManager.BinaryName, "-p", "-nonet", name)
+	}
+	return exec.LookPath(name)
 }
 
 // prepareBuildTags reads custom build tags defined by the user through the `SNOWSAW_BUILD_TAGS` environment
@@ -461,50 +546,37 @@ func runGox(envFlags map[string]string, buildFlags ...string) {
 	prt.Successf("Cross compilation completed successfully with output to %s directory", color.GreenString(buildDir))
 }
 
-// validateBuildDependencies checks if all required build dependencies are installed, the binaries are available in
-// PATH and will try to install them if not passing the checks.
-func validateBuildDependencies() {
+// validateDevTools validates that all required development tool/dependency executables are bootstrapped and
+// available in PATH or "gobin" binary cache.
+func validateDevTools() {
+	prt.Infof("Verifying development tools/dependencies")
+	handleError := func(name string, err error) {
+		prt.Errorf("Failed do determine development tool/dependency %s:\n%s",
+			color.CyanString(name), color.RedString("  %s", err))
+		prt.Warnf("Run the %s task to install all required tools/dependencies!", color.YellowString("bootstrap"))
+		os.Exit(1)
+	}
+
+	gobinPath, checkGobinPathErr := getExecutablePath(devToolManager.BinaryName, false)
+	if checkGobinPathErr != nil {
+		handleError(fmt.Sprintf("%s@%s", devToolManager.ModuleName, devToolManager.ModuleVersion), checkGobinPathErr)
+	}
+	devToolManager.BinaryExecPath = gobinPath
+
 	for _, bd := range []*buildDependency{crossCompileTool, formatTool, lintTool} {
-		binPath, err := exec.LookPath(bd.BinaryName)
-		if err == nil {
-			bd.BinaryExecPath = binPath
-			prt.Infof("Required build dependency %s already installed: %s",
-				color.CyanString(bd.PackageName),
-				color.BlueString(bd.BinaryExecPath))
+		if bd.ModuleVersion == "" {
+			p, e := getExecutablePath(bd.BinaryName, false)
+			if e != nil {
+				handleError(bd.ModuleName, e)
+			}
+			bd.BinaryExecPath = p
 			continue
 		}
 
-		prt.Infof("Installing required build dependency: %s", color.CyanString(bd.PackageName))
-		c := exec.Command(goExec, "get", "-u", bd.PackageName)
-		// Run installations outside of the project root directory to prevent the pollution of the project's Go module
-		// file.
-		// This is a necessary workaround until the Go toolchain is able to install packages globally without
-		// updating the module file when the "go get" command is run from within the project root directory.
-		// See https://github.com/golang/go/issues/30515 for more details or more details and proposed solutions
-		// that might be added to Go's build tools in future versions.
-		c.Dir = os.TempDir()
-		c.Env = os.Environ()
-		// Explicitly enable "module" mode to install development dependencies to allow to use pinned module versions.
-		env := map[string]string{"GO111MODULE": "on"}
-		for k, v := range env {
-			c.Env = append(c.Env, k+"="+v)
+		p, e := getExecutablePath(fmt.Sprintf("%s@%s", bd.ModuleName, bd.ModuleVersion), true)
+		if e != nil {
+			handleError(fmt.Sprintf("%s@%s", bd.ModuleName, bd.ModuleVersion), e)
 		}
-		if err = c.Run(); err != nil {
-			prt.Errorf("Failed to install required build dependency %s: %v", color.CyanString(bd.PackageName), err)
-			prt.Warnf("Please install manually: %s", color.CyanString("go get -u %s", bd.PackageName))
-			os.Exit(1)
-		}
-
-		binPath, err = exec.LookPath(bd.BinaryName)
-		if err != nil {
-			bd.BinaryExecPath = binPath
-			prt.Errorf("Failed to find executable path of required build dependency %s after installation: %v",
-				color.CyanString(bd.PackageName), err)
-			os.Exit(1)
-		}
-		bd.BinaryExecPath = binPath
-		prt.Infof("Using executable %s of installed build dependency %s",
-			color.CyanString(bd.BinaryExecPath),
-			color.BlueString(bd.PackageName))
+		bd.BinaryExecPath = p
 	}
 }
