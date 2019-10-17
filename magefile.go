@@ -19,6 +19,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"go/build"
 	"os"
@@ -28,9 +29,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/fatih/color"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/storer"
 
 	"github.com/arcticicestudio/snowsaw/pkg/config"
 	"github.com/arcticicestudio/snowsaw/pkg/prt"
@@ -84,8 +91,8 @@ var (
 	// The tool used to cross-compile the project asynchronously.
 	// See https://github.com/mitchellh/gox for more details.
 	crossCompileTool = &buildDependency{
-		BinaryName:  "gox",
-		ModuleName: "github.com/mitchellh/gox",
+		BinaryName:    "gox",
+		ModuleName:    "github.com/mitchellh/gox",
 		ModuleVersion: "v1.0.1",
 	}
 
@@ -110,7 +117,7 @@ var (
 	// The tool used to format all Go source files.
 	// See https://godoc.org/golang.org/x/tools/cmd/goimports for more details.
 	formatTool = &buildDependency{
-		BinaryName:  "goimports",
+		BinaryName: "goimports",
 		ModuleName: "golang.org/x/tools/cmd/goimports",
 	}
 
@@ -131,8 +138,8 @@ var (
 	// This is the same tool used by the https://golangci.com service that is also integrated in snowsaw's CI/CD pipeline.
 	// See https://github.com/golangci/golangci-lint for more details.
 	lintTool = &buildDependency{
-		BinaryName:  "golangci-lint",
-		ModuleName: "github.com/golangci/golangci-lint/cmd/golangci-lint",
+		BinaryName:    "golangci-lint",
+		ModuleName:    "github.com/golangci/golangci-lint/cmd/golangci-lint",
 		ModuleVersion: "v1.19.1",
 	}
 
@@ -367,6 +374,163 @@ func createDirectoryStructure(paths ...string) {
 	}
 }
 
+// getAppVersionFromGit assembles the version of the application from the metadata of the Git repository.
+// It searches for the latest "SemVer" compatible version tag in the current branch and falls back to the default
+// version from the application configuration if none is found.
+// If at least one tag is found but it is not the latest commit of the current branch, the build metadata will be
+// appended, consisting of the amount of commits ahead and the shortened reference hash (8 digits) of the latest commit
+// from the current branch.
+// This function is a early implementation of the Git `describe` command because support in `go-git` has not been
+// implemented yet. See the full compatibility comparision documentation with Git at
+// https://github.com/src-d/go-git/blob/master/COMPATIBILITY.md as well as the proposed Git `describe` command
+// implementation at https://github.com/src-d/go-git/pull/816 for more details.
+func getAppVersionFromGit() (string, error) {
+	// Open the repository in the current working directory.
+	repo, repoOpenErr := git.PlainOpen(".")
+	if repoOpenErr != nil {
+		return "", repoOpenErr
+	}
+
+	// Find the latest commit reference of the current branch.
+	branchRefs, repoBranchErr := repo.Branches()
+	if repoBranchErr != nil {
+		return "", repoBranchErr
+	}
+	headRef, repoHeadErr := repo.Head()
+	if repoHeadErr != nil {
+		return "", repoHeadErr
+	}
+	var currentBranchRef plumbing.Reference
+	branchRefIterErr := branchRefs.ForEach(func(branchRef *plumbing.Reference) error {
+		if branchRef.Hash() == headRef.Hash() {
+			currentBranchRef = *branchRef
+			return nil
+		}
+		return nil
+	})
+	if branchRefIterErr != nil {
+		return "", branchRefIterErr
+	}
+
+	// Find all commits in the repository starting from the HEAD of the current branch.
+	commitIterator, commitIterErr := repo.Log(&git.LogOptions{
+		From:  currentBranchRef.Hash(),
+		Order: git.LogOrderCommitterTime,
+	})
+	if commitIterErr != nil {
+		return "", commitIterErr
+	}
+
+	// Query all tags and store them in a temporary map.
+	tagIterator, repoTagsErr := repo.Tags()
+	if repoTagsErr != nil {
+		return "", repoTagsErr
+	}
+	repoTags := make(map[plumbing.Hash]*plumbing.Reference)
+	tagIterErr := tagIterator.ForEach(func(tag *plumbing.Reference) error {
+		if tagObject, tagObjectErr := repo.TagObject(tag.Hash()); tagObjectErr == nil {
+			// Only include tags that have a valid SemVer version format.
+			if _, semVerParseErr := semver.NewVersion(tag.Name().Short()); semVerParseErr == nil {
+				repoTags[tagObject.Target] = tag
+			}
+		} else {
+			repoTags[tag.Hash()] = tag
+		}
+		return nil
+	})
+	tagIterator.Close()
+	if tagIterErr != nil {
+		return "", tagIterErr
+	}
+
+	type describeCandidate struct {
+		ref       *plumbing.Reference
+		annotated bool
+		distance  int
+	}
+	var tagCandidates []*describeCandidate
+	var tagCandidatesFound int
+	var tagCount = -1
+	var lastCommit *object.Commit
+
+	// Search for maximal 10 (Git default) suitable tag candidates in all commits of the current branch.
+	for {
+		var candidate = &describeCandidate{annotated: false}
+		tagCommitIterErr := commitIterator.ForEach(func(commit *object.Commit) error {
+			lastCommit = commit
+			tagCount++
+			if tagReference, ok := repoTags[commit.Hash]; ok {
+				delete(repoTags, commit.Hash)
+				candidate.ref = tagReference
+				hash := tagReference.Hash()
+				if !bytes.Equal(commit.Hash[:], hash[:]) {
+					candidate.annotated = true
+				}
+				return storer.ErrStop
+			}
+			return nil
+		})
+		if tagCommitIterErr != nil {
+			return "", tagCommitIterErr
+		}
+
+		if candidate.annotated {
+			if tagCandidatesFound < 10 {
+				candidate.distance = tagCount
+				tagCandidates = append(tagCandidates, candidate)
+			}
+			tagCandidatesFound++
+		}
+
+		if tagCandidatesFound > 10 || len(tags) == 0 {
+			break
+		}
+	}
+
+	// Use the version from the application configuration by default or...
+	version, semVerErr := semver.NewVersion(config.Version)
+	if semVerErr != nil {
+		return "", fmt.Errorf("failed to parse default version from application configuration: %s", semVerErr)
+	}
+	if len(tagCandidates) == 0 {
+		prt.Infof("No Git tag found, using defined version %s as fallback", color.CyanString(config.Version))
+		// ...the latest Git tag from the current branch if at least one has been found.
+	} else {
+		version, semVerErr = semver.NewVersion(tagCandidates[0].ref.Name().Short())
+		if semVerErr != nil {
+			return "", fmt.Errorf("failed to parse version from Git tag %s: %s",
+				tagCandidates[0].ref.Name().Short(), semVerErr)
+		}
+	}
+	// Add additional version information if the latest commit of the current branch is not the found tag.
+	if len(tagCandidates) != 0 && tagCandidates[0].distance > 0 {
+		// If not included in the tag already, append metadata consisting of the amount of commit(s) ahead and the shortened
+		// commit hash (8 digits) of the latest commit.
+		buildMetaData := fmt.Sprintf("%s.%s", strconv.Itoa(tagCandidates[0].distance), currentBranchRef.Hash().String()[:8])
+		if version.Metadata() != "" {
+			metadataVersion, err := version.SetMetadata(fmt.Sprintf("%s-%s", version.Metadata(), buildMetaData))
+			if err != nil {
+				return "", err
+			}
+			version = &metadataVersion
+		} else {
+			metadataVersion, err := version.SetMetadata(buildMetaData)
+			if err != nil {
+				return "", err
+			}
+			version = &metadataVersion
+		}
+		prt.Infof("Using latest Git commit %s, %s commit(s) ahead of %s",
+			color.CyanString(currentBranchRef.Hash().String()[:8]),
+			color.CyanString(strconv.Itoa(tagCandidates[0].distance)),
+			color.CyanString("%s", tagCandidates[0].ref.Name().Short()))
+	} else {
+		prt.Infof("Using Git tag %s as application version", color.CyanString(version.Original()))
+	}
+
+	return version.String(), nil
+}
+
 // getEnvFlags returns environment variables storing metadata the build time, Git version tags and commit checksum.
 func getEnvFlags() map[string]string {
 	buildDate := time.Now().Format(time.RFC3339)
@@ -377,32 +541,17 @@ func getEnvFlags() map[string]string {
 		os.Exit(1)
 	}
 
-	var version []string
-	// Find the latest Git tag in all branches, otherwise use the defined version.
-	latestGitTag, _ := sh.Output("git", "rev-list", "--tags", "--max-count=1")
-	if tag, gitTagErr := sh.Output("git", "describe", "--tags", latestGitTag); gitTagErr != nil {
-		version = append(version, "develop")
-		prt.Infof("No Git tag found, using %s as fallback version", color.CyanString("develop"))
-	} else {
-		version = append(version, tag)
-		prt.Infof("Using Git tag %s as version", color.CyanString(tag))
-	}
-
-	// If the current branch is ahead of the `master` branch append the commit count and hash of the latest commit.
-	commitsAhead, _ := sh.Output("git", "rev-list", "--count", "master..HEAD")
-	commitCount, err := strconv.Atoi(commitsAhead)
-	if err == nil && commitCount > 0 {
-		commitHash, _ := sh.Output("git", "rev-parse", "--short=8", "HEAD")
-		version = append(version, commitsAhead, commitHash)
-		prt.Infof("Building with latest Git commit %s, %s commits ahead of %s branch",
-			color.CyanString(commitHash), color.CyanString(commitsAhead), color.CyanString("master"))
+	version, versionErr := getAppVersionFromGit()
+	if versionErr != nil {
+		prt.Errorf("Failed to assemble application version: %s", versionErr)
+		os.Exit(1)
 	}
 
 	prt.Infof(
 		"Injecting %s:\n"+
 			"  Build Date: %s\n"+
 			"  Version: %s",
-		color.BlueString("LDFLAGS"), color.CyanString(buildDate), color.CyanString(strings.Join(version, "-")))
+		color.BlueString("LDFLAGS"), color.CyanString(buildDate), color.CyanString(version))
 
 	prt.Infof(
 		"Injecting %s:\n"+
@@ -418,7 +567,7 @@ func getEnvFlags() map[string]string {
 		"BUILD_DATE_TIME": buildDate,
 		"PACKAGE_NAME":    config.PackageName,
 		"PROJECT_ROOT":    pwd,
-		"VERSION":         strings.Join(version, "-")}
+		"VERSION":         version}
 }
 
 // getExecutablePath returns the path to the executable for the given package/module.
