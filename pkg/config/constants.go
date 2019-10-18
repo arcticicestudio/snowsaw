@@ -41,18 +41,21 @@ var (
 	// AppConfigPaths is the default paths the application will search for configuration files.
 	AppConfigPaths []*file.File
 
+	// AppVersion is the application version.
+	AppVersion = "0.0.0"
+
+	// AppVersionBuildDateTime is the date and time when this application version was built.
+	AppVersionBuildDateTime string
+
+	// AppVersionGoRuntime is the Go runtime version with which this application was built.
+	AppVersionGoRuntime string
+
 	availableTaskRunner = []snowblock.TaskRunner{
 		&clean.Clean{},
 		&link.Link{},
 		&shell.Shell{},
 	}
 
-	// BuildDateTime is the date and time this application was build.
-	BuildDateTime string
-
 	// SnowblockTaskRunnerRegistry is the application-wide registry for snowblock task runner.
 	SnowblockTaskRunnerRegistry = task.NewRegistry()
-
-	// Version is the application version.
-	Version = "0.0.0"
 )

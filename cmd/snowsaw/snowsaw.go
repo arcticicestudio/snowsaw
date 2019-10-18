@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/arcticicestudio/snowsaw/cmd/snowsaw/bootstrap"
-	"github.com/arcticicestudio/snowsaw/cmd/snowsaw/info"
+	info "github.com/arcticicestudio/snowsaw/cmd/snowsaw/version"
 	"github.com/arcticicestudio/snowsaw/pkg/config"
 	"github.com/arcticicestudio/snowsaw/pkg/config/builder"
 	"github.com/arcticicestudio/snowsaw/pkg/config/source/file"
@@ -76,12 +76,12 @@ func init() {
 		"comma-separated paths to snowblock base directories")
 
 	// Set the app version information for the automatically generated `version` flag.
-	rootCmd.Version = color.CyanString(config.Version)
+	rootCmd.Version = color.CyanString(config.AppVersion)
 	rootCmd.SetVersionTemplate(`{{printf "%s\n" .Version}}`)
 
 	// Create and register all subcommands.
-	rootCmd.AddCommand(info.NewInfoCmd())
 	rootCmd.AddCommand(bootstrap.NewBootstrapCmd())
+	rootCmd.AddCommand(info.NewVersionCmd())
 }
 
 // initConfig searches and loads either the default application configuration file paths or the explicit file at the

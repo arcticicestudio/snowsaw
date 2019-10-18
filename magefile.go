@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -143,8 +144,9 @@ var (
 	goPath string
 
 	// Arguments for the `-ldflags` flag to pass on each `go tool link` invocation.
-	ldFlags = "-X $PACKAGE_NAME/pkg/config.BuildDateTime=$BUILD_DATE_TIME" +
-		" -X $PACKAGE_NAME/pkg/config.Version=$VERSION"
+	ldFlags = "-X $PACKAGE_NAME/pkg/config.AppVersion=$APP_VERSION" +
+		" -X $PACKAGE_NAME/pkg/config.AppVersionBuildDateTime=$APP_VERSION_BUILD_DATE_TIME" +
+		" -X $PACKAGE_NAME/pkg/config.AppVersionGoRuntime=$APP_VERSION_GO_RUNTIME"
 
 	// The tool used to lint all Go source files.
 	// This is the same tool used by the https://golangci.com service that is also integrated in snowsaw's CI/CD pipeline.
@@ -500,13 +502,13 @@ func getAppVersionFromGit() (*appVersion, error) {
 	}
 
 	// Use the version from the application configuration by default or...
-	semVersion, semVerErr := semver.NewVersion(config.Version)
+	semVersion, semVerErr := semver.NewVersion(config.AppVersion)
 	version := &appVersion{Version: semVersion}
 	if semVerErr != nil {
 		return nil, fmt.Errorf("failed to parse default version from application configuration: %s", semVerErr)
 	}
 	if len(tagCandidates) == 0 {
-		prt.Infof("No Git tag found, using defined version %s as fallback", color.CyanString(config.Version))
+		prt.Infof("No Git tag found, using defined version %s as fallback", color.CyanString(config.AppVersion))
 		// ...the latest Git tag from the current branch if at least one has been found.
 	} else {
 		semVersion, semVerErr = semver.NewVersion(tagCandidates[0].ref.Name().Short())
@@ -568,8 +570,12 @@ func getEnvFlags() map[string]string {
 	prt.Infof(
 		"Injecting %s:\n"+
 			"  Build Date: %s\n"+
-			"  Version: %s",
-		color.BlueString("LDFLAGS"), color.CyanString(buildDate), color.CyanString(version.String()))
+			"  Version: %s\n"+
+			"  Go Runtime: %s",
+		color.BlueString("LDFLAGS"),
+		color.CyanString(buildDate),
+		color.CyanString(version.String()),
+		color.CyanString(runtime.Version()))
 
 	prt.Infof(
 		"Injecting %s:\n"+
@@ -582,10 +588,12 @@ func getEnvFlags() map[string]string {
 		color.BlueString("GCFLAGS"), color.CyanString(pwd))
 
 	return map[string]string{
-		"BUILD_DATE_TIME": buildDate,
-		"PACKAGE_NAME":    config.PackageName,
-		"PROJECT_ROOT":    pwd,
-		"VERSION":         version.String()}
+		"APP_VERSION":                 version.String(),
+		"APP_VERSION_BUILD_DATE_TIME": buildDate,
+		"APP_VERSION_GO_RUNTIME":      runtime.Version(),
+		"PACKAGE_NAME":                config.PackageName,
+		"PROJECT_ROOT":                pwd,
+	}
 }
 
 // getExecutablePath returns the path to the executable for the given package/module.
