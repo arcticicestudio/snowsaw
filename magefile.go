@@ -43,6 +43,18 @@ import (
 	"github.com/arcticicestudio/snowsaw/pkg/prt"
 )
 
+// appVersion stores information and metadata about the application version.
+type appVersion struct {
+	// Version is the application SemVer version.
+	*semver.Version
+	// GitCommitsAhead is the count of commits ahead to the latest Git version tag in the current branch.
+	GitCommitsAhead int
+	// GitCommitHash is the hash of the latest commit in the current branch.
+	GitCommitHash plumbing.Hash
+	// GitLatestVersionTag is the latest Git version tag in the current branch.
+	GitLatestVersionTag *plumbing.Reference
+}
+
 // buildDependency represents a build dependency like a tool used to build or develop the project.
 type buildDependency struct {
 	// BinaryExecPath is the path of the binary executable.
@@ -375,8 +387,8 @@ func createDirectoryStructure(paths ...string) {
 }
 
 // getAppVersionFromGit assembles the version of the application from the metadata of the Git repository.
-// It searches for the latest "SemVer" compatible version tag in the current branch and falls back to the default
-// version from the application configuration if none is found.
+// It searches for the latest SemVer (https://semver.org) compatible version tag in the current branch and falls back to
+// the default version from the application configuration if none is found.
 // If at least one tag is found but it is not the latest commit of the current branch, the build metadata will be
 // appended, consisting of the amount of commits ahead and the shortened reference hash (8 digits) of the latest commit
 // from the current branch.
@@ -384,21 +396,21 @@ func createDirectoryStructure(paths ...string) {
 // implemented yet. See the full compatibility comparision documentation with Git at
 // https://github.com/src-d/go-git/blob/master/COMPATIBILITY.md as well as the proposed Git `describe` command
 // implementation at https://github.com/src-d/go-git/pull/816 for more details.
-func getAppVersionFromGit() (string, error) {
+func getAppVersionFromGit() (*appVersion, error) {
 	// Open the repository in the current working directory.
 	repo, repoOpenErr := git.PlainOpen(".")
 	if repoOpenErr != nil {
-		return "", repoOpenErr
+		return nil, repoOpenErr
 	}
 
 	// Find the latest commit reference of the current branch.
 	branchRefs, repoBranchErr := repo.Branches()
 	if repoBranchErr != nil {
-		return "", repoBranchErr
+		return nil, repoBranchErr
 	}
 	headRef, repoHeadErr := repo.Head()
 	if repoHeadErr != nil {
-		return "", repoHeadErr
+		return nil, repoHeadErr
 	}
 	var currentBranchRef plumbing.Reference
 	branchRefIterErr := branchRefs.ForEach(func(branchRef *plumbing.Reference) error {
@@ -409,7 +421,7 @@ func getAppVersionFromGit() (string, error) {
 		return nil
 	})
 	if branchRefIterErr != nil {
-		return "", branchRefIterErr
+		return nil, branchRefIterErr
 	}
 
 	// Find all commits in the repository starting from the HEAD of the current branch.
@@ -418,13 +430,13 @@ func getAppVersionFromGit() (string, error) {
 		Order: git.LogOrderCommitterTime,
 	})
 	if commitIterErr != nil {
-		return "", commitIterErr
+		return nil, commitIterErr
 	}
 
 	// Query all tags and store them in a temporary map.
 	tagIterator, repoTagsErr := repo.Tags()
 	if repoTagsErr != nil {
-		return "", repoTagsErr
+		return nil, repoTagsErr
 	}
 	repoTags := make(map[plumbing.Hash]*plumbing.Reference)
 	tagIterErr := tagIterator.ForEach(func(tag *plumbing.Reference) error {
@@ -440,7 +452,7 @@ func getAppVersionFromGit() (string, error) {
 	})
 	tagIterator.Close()
 	if tagIterErr != nil {
-		return "", tagIterErr
+		return nil, tagIterErr
 	}
 
 	type describeCandidate struct {
@@ -471,7 +483,7 @@ func getAppVersionFromGit() (string, error) {
 			return nil
 		})
 		if tagCommitIterErr != nil {
-			return "", tagCommitIterErr
+			return nil, tagCommitIterErr
 		}
 
 		if candidate.annotated {
@@ -488,17 +500,19 @@ func getAppVersionFromGit() (string, error) {
 	}
 
 	// Use the version from the application configuration by default or...
-	version, semVerErr := semver.NewVersion(config.Version)
+	semVersion, semVerErr := semver.NewVersion(config.Version)
+	version := &appVersion{Version: semVersion}
 	if semVerErr != nil {
-		return "", fmt.Errorf("failed to parse default version from application configuration: %s", semVerErr)
+		return nil, fmt.Errorf("failed to parse default version from application configuration: %s", semVerErr)
 	}
 	if len(tagCandidates) == 0 {
 		prt.Infof("No Git tag found, using defined version %s as fallback", color.CyanString(config.Version))
 		// ...the latest Git tag from the current branch if at least one has been found.
 	} else {
-		version, semVerErr = semver.NewVersion(tagCandidates[0].ref.Name().Short())
+		semVersion, semVerErr = semver.NewVersion(tagCandidates[0].ref.Name().Short())
+		version = &appVersion{Version: semVersion}
 		if semVerErr != nil {
-			return "", fmt.Errorf("failed to parse version from Git tag %s: %s",
+			return nil, fmt.Errorf("failed to parse version from Git tag %s: %s",
 				tagCandidates[0].ref.Name().Short(), semVerErr)
 		}
 	}
@@ -510,25 +524,29 @@ func getAppVersionFromGit() (string, error) {
 		if version.Metadata() != "" {
 			metadataVersion, err := version.SetMetadata(fmt.Sprintf("%s-%s", version.Metadata(), buildMetaData))
 			if err != nil {
-				return "", err
+				return nil, err
 			}
-			version = &metadataVersion
+			version.Version = &metadataVersion
 		} else {
 			metadataVersion, err := version.SetMetadata(buildMetaData)
 			if err != nil {
-				return "", err
+				return nil, err
 			}
-			version = &metadataVersion
+			version.Version = &metadataVersion
 		}
+
+		version.GitCommitsAhead = tagCandidates[0].distance
+		version.GitCommitHash = currentBranchRef.Hash()
+		version.GitLatestVersionTag = tagCandidates[0].ref
 		prt.Infof("Using latest Git commit %s, %s commit(s) ahead of %s",
-			color.CyanString(currentBranchRef.Hash().String()[:8]),
-			color.CyanString(strconv.Itoa(tagCandidates[0].distance)),
-			color.CyanString("%s", tagCandidates[0].ref.Name().Short()))
+			color.CyanString(version.GitCommitHash.String()[:8]),
+			color.CyanString(strconv.Itoa(version.GitCommitsAhead)),
+			color.CyanString("%s", version.GitLatestVersionTag.Name().Short()))
 	} else {
 		prt.Infof("Using Git tag %s as application version", color.CyanString(version.Original()))
 	}
 
-	return version.String(), nil
+	return version, nil
 }
 
 // getEnvFlags returns environment variables storing metadata the build time, Git version tags and commit checksum.
@@ -551,7 +569,7 @@ func getEnvFlags() map[string]string {
 		"Injecting %s:\n"+
 			"  Build Date: %s\n"+
 			"  Version: %s",
-		color.BlueString("LDFLAGS"), color.CyanString(buildDate), color.CyanString(version))
+		color.BlueString("LDFLAGS"), color.CyanString(buildDate), color.CyanString(version.String()))
 
 	prt.Infof(
 		"Injecting %s:\n"+
@@ -567,7 +585,7 @@ func getEnvFlags() map[string]string {
 		"BUILD_DATE_TIME": buildDate,
 		"PACKAGE_NAME":    config.PackageName,
 		"PROJECT_ROOT":    pwd,
-		"VERSION":         version}
+		"VERSION":         version.String()}
 }
 
 // getExecutablePath returns the path to the executable for the given package/module.
