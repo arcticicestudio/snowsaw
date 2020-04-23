@@ -336,7 +336,7 @@ Please report issues/bugs, feature requests and suggestions for improvements to 
 ## Credits
 snowsaw is based on the awesome [Dotbot](https://github.com/anishathalye/dotbot) project by [@anishathalye](https://github.com/anishathalye) as a customized fork for my personal dotfiles repository [Igloo](https://github.com/arcticicestudio/igloo).
 
-<p align="center"><img src="https://cdn.rawgit.com/arcticicestudio/nord/develop/src/assets/banner-footer-mountains.svg" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/arcticicestudio/nord-docs/develop/assets/images/nord/repository-footer-separator.svg?sanitize=true" /></p>
 
 <p align="center"><img src="https://img.shields.io/badge/License-MIT-5E81AC.svg?style=flat-square"/></p>
 
