@@ -15,7 +15,7 @@
 
 <p align="center"><img src="https://cdn.rawgit.com/arcticicestudio/snowsaw/develop/assets/snowsaw-banner.svg"/></p>
 
-<p align="center"><img src="https://assets-cdn.github.com/favicon.ico" width=24 height=24/> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/github/release/arcticicestudio/snowsaw.svg"/></a> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/badge/pre--release---_-blue.svg"/></a> <img src="https://www.python.org/static/favicon.ico" width=24 height=24/> <img src="https://img.shields.io/badge/Python-3.5+-blue.svg"/></p>
+<p align="center"><a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/github/release/arcticicestudio/snowsaw.svg?style=flat-square&color=88C0D0&label=Release&logo=github&logoColor=eceff4"/></a> <a href="https://github.com/arcticicestudio/snowsaw/releases/latest"><img src="https://img.shields.io/badge/pre--release---_-88C0D0.svg?style=flat-square"/></a> <img src="https://img.shields.io/badge/Python-3.5+-88C0D0.svg?style=flat-square&logo=python&logoColor=eceff4"/></p>
 
 <p align="center">A lightweight, plugin-driven and simple configurable dotfile bootstrapper.</p>
 
@@ -312,7 +312,7 @@ Defaults are specified as a dictionary mapping action names to settings, which a
 ```
 
 ## Development
-[![](https://img.shields.io/badge/Changelog-0.2.0-blue.svg)](https://github.com/arcticicestudio/snowsaw/blob/v0.2.0/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-blue.svg)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-blue.svg)](https://github.com/arcticicestudio/arcver)
+[![](https://img.shields.io/badge/Changelog-0.2.0-81A1C1.svg?style=flat-square)](https://github.com/arcticicestudio/snowsaw/blob/v0.2.0/CHANGELOG.md) [![](https://img.shields.io/badge/Workflow-gitflow--branching--model-81A1C1.svg?style=flat-square)](http://nvie.com/posts/a-successful-git-branching-model) [![](https://img.shields.io/badge/Versioning-ArcVer_0.8.0-81A1C1.svg?style=flat-square)](https://github.com/arcticicestudio/arcver)
 
 ### Debugging
 #### JetBrains PyCharm
@@ -336,9 +336,9 @@ Please report issues/bugs, feature requests and suggestions for improvements to 
 ## Credits
 snowsaw is based on the awesome [Dotbot](https://github.com/anishathalye/dotbot) project by [@anishathalye](https://github.com/anishathalye) as a customized fork for my personal dotfiles repository [Igloo](https://github.com/arcticicestudio/igloo).
 
-<p align="center"><img src="https://cdn.rawgit.com/arcticicestudio/nord/develop/src/assets/banner-footer-mountains.svg" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/arcticicestudio/nord-docs/develop/assets/images/nord/repository-footer-separator.svg?sanitize=true" /></p>
 
-<p align="center"><img src="https://img.shields.io/badge/License-MIT-blue.svg"/></p>
+<p align="center"><img src="https://img.shields.io/badge/License-MIT-5E81AC.svg?style=flat-square"/></p>
 
 [scrot-readme-debugging-run-configuration]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run-configuration.png
 [scrot-readme-debugging-run]: https://raw.githubusercontent.com/arcticicestudio/snowsaw/develop/assets/scrot-readme-debugging-run.png
