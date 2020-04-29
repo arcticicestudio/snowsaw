@@ -8,6 +8,7 @@ This is the main entry point of the public API.
 from argparse import ArgumentParser
 import glob
 import os
+import subprocess
 
 from .config import ConfigReader, ReadingError
 from .dispatcher import Dispatcher, DispatchError
@@ -27,11 +28,12 @@ def add_options(parser):
     parser.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='suppress most output')
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help='enable verbose output')
     parser.add_argument('-s', '--snowblocks-directory', nargs=1, dest='snowblocks_directory',
-                        help='base snowblock directory to run all tasks of', metavar='SNOWBLOCKSDIR', required=True)
+                        help='base snowblock directory to run all tasks of', metavar='SNOWBLOCKSDIR')
     parser.add_argument('-c', '--config-file', nargs=1, dest='config_file', help='run tasks for the specified snowblock', metavar='CONFIGFILE')
     parser.add_argument('-p', '--plugin', action='append', dest='plugins', default=[], help='load PLUGIN as a plugin', metavar='PLUGIN')
     parser.add_argument('--disable-core-plugins', dest='disable_core_plugins', action='store_true', help='disable all core plugins')
     parser.add_argument('--plugin-dir', action='append', dest='plugin_dirs', default=[], metavar='PLUGIN_DIR', help='load all plugins in PLUGIN_DIR')
+    parser.add_argument('--version', action='store_true', help='print snowsaw version')
 
 
 def read_config(config_file):
@@ -57,6 +59,28 @@ def main():
         snowblock_config_filename = "snowblock.json"
         add_options(parser)
         options = parser.parse_args()
+
+        if options.version :
+            """
+            Just print version end exit. Don't need to process other arguments.
+            Change directory to ensure git-related commands are called inside
+            snowsaw repository and than change it back
+            """
+            caller_dir = os.getcwd()
+            snowsaw_dir = os.path.dirname(os.path.realpath(__file__))
+            os.chdir(snowsaw_dir)
+            try:
+                current_version = subprocess.check_output(["git", "describe"]).strip()
+            except subprocess.CalledProcessError as Error :
+                current_version = "Not tagged (development) version"
+            print(current_version)
+            os.chdir(caller_dir)
+            return current_version
+        elif not options.snowblocks_directory :
+            """
+            Since it's not a version request, check required arguments existance
+            """
+            parser.error("argument -s/--snowblocks-directory is required")
 
         if options.super_quiet:
             log.set_level(Level.WARNING)

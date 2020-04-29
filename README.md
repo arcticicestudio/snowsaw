@@ -185,6 +185,8 @@ A terminal help page can be shown by using the `-h`/`--help` option.
 | `-p`, `--plugin` | `PLUGIN` | No | Load `PLUGIN` as a plugin. |
 | `--disable-core-plugins` | - | No | Disable all core plugins. |
 | `--plugin-dir` | `PLUGIN_DIR` | No | Load all plugins in `PLUGIN_DIR`. |
+| `--version`  | | No | Prints current version of snowsaw |
+
 
 ## Configuration
 snowsaw uses [JSON](http://json.org) configuration files to specify tasks on how to set up your dotfiles.
