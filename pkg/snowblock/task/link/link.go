@@ -234,7 +234,7 @@ func (l *Link) execute() error {
 			return nil
 		}
 
-		return fmt.Errorf("file or directory already exists: %s", l.config.Path)
+		return fmt.Errorf("file or directory already exists: %s", l.destAbsPath)
 	}
 
 	// ...otherwise only when all previous conditions are not met.
