@@ -57,7 +57,7 @@ class Link(snowsaw.Plugin):
                 else:
                     for host in hosts.items():
                         self._log.lowinfo("Skipped host specific link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(), host[1])))
-                    return True
+                    continue
 
             if not self._exists(os.path.join(self._context.snowblock_dir(), path)):
                 success = False
