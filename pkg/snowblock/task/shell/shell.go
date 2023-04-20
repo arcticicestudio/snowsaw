@@ -24,7 +24,6 @@ import (
 
 	"github.com/arcticicestudio/snowsaw/pkg/api/snowblock"
 	"github.com/arcticicestudio/snowsaw/pkg/prt"
-	"github.com/arcticicestudio/snowsaw/pkg/util/filesystem"
 )
 
 const (
@@ -78,18 +77,12 @@ func (s *Shell) Run(configuration snowblock.TaskConfiguration, snowblockAbsPath 
 			if err := mapstructure.Decode(configType, &s.config); err != nil {
 				return err
 			}
-			if parseCmdElErr := s.parseCommand(s.config.Command); parseCmdElErr != nil {
-				return parseCmdElErr
-			}
 			if execErr := s.execute(); execErr != nil {
 				return execErr
 			}
 
 		// Handle JSON `string` configurations used to only specify a single command.
 		case string:
-			if parseCmdElErr := s.parseCommand(configType); parseCmdElErr != nil {
-				return parseCmdElErr
-			}
 			s.config.Command = configType
 			if execErr := s.execute(); execErr != nil {
 				return execErr
@@ -114,9 +107,6 @@ func (s *Shell) Run(configuration snowblock.TaskConfiguration, snowblockAbsPath 
 				return fmt.Errorf("invalid amount of shell command arguments, expected %d but got %d",
 					CommandConfigArrayMaxArgs, len(configStringValues))
 			}
-			if parseCmdElErr := s.parseCommand(configStringValues[0]); parseCmdElErr != nil {
-				return parseCmdElErr
-			}
 			s.config.Command = configStringValues[0]
 			s.config.Description = configStringValues[1]
 			if execErr := s.execute(); execErr != nil {
@@ -134,6 +124,8 @@ func (s *Shell) Run(configuration snowblock.TaskConfiguration, snowblockAbsPath 
 }
 
 func (s *Shell) execute() error {
+	s.cmd = os.Getenv("SHELL")
+	s.cmdArgs = append(s.cmdArgs, "-c", s.config.Command)
 	cmd := exec.Command(s.cmd, s.cmdArgs...)
 	cmd.Dir = s.snowblockAbsPath
 	cmd.Env = os.Environ()
@@ -157,28 +149,5 @@ func (s *Shell) execute() error {
 			color.CyanString("%s %s", s.cmd, strings.Join(s.cmdArgs, " ")))
 	}
 
-	return nil
-}
-
-func (s *Shell) parseCommand(cmd string) error {
-	parts := strings.Split(strings.TrimSpace(cmd), " ")
-	if parts[0] == "" {
-		return fmt.Errorf("shell command must not be empty or whitespace-only")
-	}
-
-	// Simulate shell specific behavior by trying to expand possible environment and special variables.
-	// Note that this is only necessary to keep the compatibility with the original Python implementation that runs
-	// commands with a specific shell simulation flag in order to provide these features which is described as "strongly
-	// discouraged" in the reference documentations because it makes the application vulnerable to "shell injection".
-	for idx, part := range parts {
-		expPart, partExpandErr := filesystem.ExpandPath(part)
-		if partExpandErr != nil {
-			return partExpandErr
-		}
-		parts[idx] = expPart
-	}
-
-	s.cmd = parts[0]
-	s.cmdArgs = append(s.cmdArgs, parts[1:]...)
 	return nil
 }
