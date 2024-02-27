@@ -3,6 +3,8 @@
 import os
 import subprocess
 import snowsaw
+from socket import gethostname
+
 
 
 class Shell(snowsaw.Plugin):
@@ -40,22 +42,33 @@ class Shell(snowsaw.Plugin):
                         stdout = None
                     if item.get("stderr", defaults.get("stderr", False)) is True:
                         stderr = None
+                    host = item.get("host", None)
                 elif isinstance(item, list):
                     cmd = item[0]
                     msg = item[1] if len(item) > 1 else None
                 else:
                     cmd = item
                     msg = None
-                if msg is None:
-                    self._log.lowinfo(cmd)
-                else:
-                    self._log.lowinfo('{} [{}]'.format(msg, cmd))
                 executable = os.environ.get("SHELL")
-                ret = subprocess.call(cmd, shell=True, stdin=stdin, stdout=stdout, stderr=stderr, cwd=self._context.snowblock_dir(),
+                shouldExecute = False
+                if host is None:
+                    shouldExecute = True
+                elif host == gethostname():
+                    shouldExecute = True
+                elif host == "-":
+                    shouldExecute = True
+                if shouldExecute:
+                    if msg is None:
+                        self._log.lowinfo(cmd)
+                    else:
+                        self._log.lowinfo('{} [{}]'.format(msg, cmd))    
+                    ret = subprocess.call(cmd, shell=True, stdin=stdin, stdout=stdout, stderr=stderr, cwd=self._context.snowblock_dir(),
                                       executable=executable)
-                if ret != 0:
-                    success = False
-                    self._log.warning("Command [{}] failed".format(cmd))
+                    if ret != 0:
+                        success = False
+                        self._log.warning("Command [{}] failed".format(cmd))
+                else:
+                    self._log.lowinfo("Skipping command [{}]".format(cmd))
         if success:
             self._log.info("=> All commands have been executed")
         else:
